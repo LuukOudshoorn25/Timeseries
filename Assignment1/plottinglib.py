@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import statsmodels.api as sm 
+from statsmodels.tsa.stattools import acf
 def plot_raw_data(df):
     plt.figure()
     plt.scatter(df.index, df.volume,s=2,color='black')
@@ -95,22 +96,17 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname):
 
 
 def plot_fig2_6(times, eps, fname):
-    fig, [ax1, ax2] = plt.subplots(2, 1, figsize=(5, 3.5))
+    fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
     ax1.plot(times[1:], eps[1:], color='black', lw=0.7)
     ax1.plot(times[1:], np.zeros(len(eps)-1), color='black', lw=0.7)
-
-    ax1.set_ylabel('Volume of Nile (filtered state)')
-
     ax2.hist(eps, lw=1, bins=14, fill=False,density=True)
-    ax2.set_ylabel('Filtered state variance')
-
-    # ax3.plot(times[1:], alphas[1:], color='tomato', lw=0.7)
-    # ax3.plot(times, y, color='black', lw=0.7)
-    # ax3.set_ylabel('Smoothed State')
-    #
-    # ax4.plot(times[1:-2], V[1:-2], color='black', lw=1)
-    # ax4.set_ylabel('Smoothed state Variance')
-
+    sm.qqplot(eps, line ='45', ax=ax3,ms=0,lw=1,ls='solid' )
+    
+    acf_ = acf(eps,nlags=10)
+    ax4.bar(np.arange(len(acf_))[1:],acf_[1:],color='grey')
+    ax4.axhline(0,ls='--',color='black',lw=0.5)
+    ax4.set_ylim(-1,1)
+    
     plt.tight_layout()
     plt.savefig(fname, bbox_inches='tight')
     plt.show()
