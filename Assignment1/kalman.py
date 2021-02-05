@@ -10,7 +10,7 @@ class KFclass():
         self.times = df.index
         self.pardict = init_pars
        
-    def iterate(self):
+    def iterate(self,plot=True):
         """Iterate over the observations and update the filtered values after each iteration"""
         # Create empty arrays to store values
         F = np.zeros(len(self.y))
@@ -34,10 +34,12 @@ class KFclass():
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         # Obtain std error of prediction form variance
         std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
+        if plot:
+            plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
         return a, std, P, v, F
 
-    def state_smooth(self):
-        a, std, P, v, F = self.iterate()
+    def state_smooth(self,plot=True):
+        a, std, P, v, F = self.iterate(plot=False)
         # Obtain all time values for L
         L = self.pardict['sigma_eps2']/F
         # Do the recursion for r
@@ -59,12 +61,24 @@ class KFclass():
             alphas[t] = a[t] + P[t]*r[t-1]
         alphas[-1]=np.nan
         std = np.sqrt(V)[1:]
-        plot_fig2_2(self.times, self.y,alphas, std, V, r, N,'Fig22.pdf')
-        return alphas
+        if plot:
+            plot_fig2_2(self.times, self.y,alphas, std, V, r, N,'Fig22.pdf')
+        return alphas, N
 
-    def run(self):
-        """Caller function to run Kalman filter and to plot stuff afterwards"""
-        # Run KF filter and obtain arrays
-        a, std, P, v, F = self.iterate()
-        # Now plot the results
-        plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
+    def disturbance_smoothing(self):
+        a, std, P, v, F = self.iterate(plot=False)
+        # Obtain alpha hats
+        alphas, N = self.state_smooth(plot=False)
+        # Obtain Observation error
+        eps_hat = self.y-alphas
+        # Obtain State error
+        eta_hat = np.roll(alphas,-1)-alphas
+        # Obtain D
+        D = 1/F + N*(P/F)**2
+        # Obtain State error variance
+        var_eta = self.pardict['sigma_eta2'] - self.pardict['sigma_eta2']**2*N
+        # Obtain Observation error variance
+        var_eps = self.pardict['sigma_eps2'] - (self.pardict['sigma_eps2']**2)*D
+
+        plot_fig2_3(self.times, eps_hat,var_eps,eta_hat, var_eta,'Fig23.pdf')
+

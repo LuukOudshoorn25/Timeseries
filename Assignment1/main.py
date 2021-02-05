@@ -29,6 +29,11 @@ df = pd.DataFrame(df)
 parameters = {'P1':1e7,
               'sigma_eps2':15099,
               'sigma_eta2':1469.1}
+# Create Kalman filter object
 KFobj = KFclass(df, init_pars=parameters, var='volume')
-#KFobj.run()
+# Plot basic Kalman filtering
+KFobj.iterate()
+# Plot state smoothing 
 KFobj.state_smooth()
+# Plot disturbance smoothing
+KFobj.disturbance_smoothing()
