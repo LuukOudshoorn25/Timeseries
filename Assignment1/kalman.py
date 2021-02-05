@@ -142,4 +142,11 @@ class KFclass():
             plot_fig2_5(self.times, self.y,a,P,alphas,V,'Fig25.pdf')
         # Restore data
         self.reset_data()
-        
+
+    def diagnostic(self, plot=True):
+        a, std, P, v, F = self.iterate(plot=False)
+        # obtain standardised forecast errors
+        eps = v/np.sqrt(F)
+        print(eps, self.times)
+        if plot:
+            plot_fig2_6(self.times, eps, 'Fig26.pdf')
