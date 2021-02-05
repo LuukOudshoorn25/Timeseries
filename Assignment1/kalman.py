@@ -44,7 +44,7 @@ class KFclass():
             P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         # Obtain std error of prediction form variance
-        std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
+        std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
         if plot:
             plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
         return a, std, P, v, F

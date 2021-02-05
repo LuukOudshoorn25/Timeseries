@@ -38,5 +38,5 @@ class KFpredictor():
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
         
         if plot:
-            plot_fig2_1(self.times, self.y,a, std, P, a, F,'Fig21.pdf')
+            plot_fig2_1(self.times, self.y,a, std, P, a, F,'Fig26.pdf')
         return a, std, P, v, F
