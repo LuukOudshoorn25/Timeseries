@@ -14,8 +14,8 @@ def plot_fig2_1(times, y, a, std, P, v, F,fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='black',lw=1)
     ax1.scatter(times, y, s=1,color='black')
-    ax1.plot(times[1:], a[1:]+1.645*std,color='grey',lw=0.7)
-    ax1.plot(times[1:], a[1:]-1.645*std,color='grey',lw=0.7)
+    ax1.plot(times[1:], a[1:]+1.645*std[1:],color='grey',lw=0.7)
+    ax1.plot(times[1:], a[1:]-1.645*std[1:],color='grey',lw=0.7)
     ax1.set_ylabel('Volume of Nile')
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)

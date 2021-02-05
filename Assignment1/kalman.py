@@ -90,7 +90,6 @@ class KFclass():
         var_eta = self.pardict['sigma_eta2'] - self.pardict['sigma_eta2']**2*N
         # Obtain Observation error variance
         var_eps = self.pardict['sigma_eps2'] - (self.pardict['sigma_eps2']**2)*D
-
         plot_fig2_3(self.times, eps_hat,var_eps,eta_hat, var_eta,'Fig23.pdf')
 
     def missing_data(self,plot=True):

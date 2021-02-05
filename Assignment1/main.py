@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # Import our own libs with functions
 from plottinglib import *
 from kalman import KFclass
-
+from kalman_prediction import *
 def main():
     # Import required libs
     
@@ -40,8 +40,14 @@ def main():
     # Plot disturbance smoothing
     #KFobj.disturbance_smoothing()
     # Now with missing values
-    KFobj.missing_data()
+    #KFobj.missing_data()
 
+    # Now predictions using Kalman filter
+    # Extend df with missing observations
+    df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'volume':np.ones(30)*np.nan}).set_index('year')
+    df_extended = pd.concat((df, df_ext))
+    KFpred = KFpredictor(df_extended, init_pars=parameters, var='volume')
+    KFpred.iterate()
 
 
 if __name__ == "__main__":
