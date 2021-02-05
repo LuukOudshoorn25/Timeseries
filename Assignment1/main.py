@@ -3,15 +3,17 @@
 ###     Main python file         ###
 ###                              ###
 ####################################
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Import our own libs with functions
+from plottinglib import *
+from kalman import KFclass
+
 def main():
     # Import required libs
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-
-    # Import our own libs with functions
-    from plottinglib import *
-    from kalman import KFclass
+    
     # Set matplotlib style for fancy plotting
     plt.style.use('MNRAS_stylesheet')
 

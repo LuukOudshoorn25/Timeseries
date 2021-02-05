@@ -108,7 +108,7 @@ class KFclass():
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
             # K is defined as ratio of P and F
-            Kt = P[t]/F[t] if 
+            Kt = P[t]/F[t]# if 
             v[t] = self.y[t]-a[t]
             a_cond = a[t] + Kt*v[t]
             a[t+1] = a[t] + Kt*v[t]
