@@ -101,6 +101,7 @@ def plot_fig2_6(times, eps, fname):
     ax1.plot(times[1:], np.zeros(len(eps)-1), color='black', lw=0.7)
     ax2.hist(eps, lw=1, bins=14, fill=False,density=True)
     sm.qqplot(eps, line ='45', ax=ax3,ms=0,lw=1,ls='solid' )
+    ax3.set_ylabel('')
     
     acf_ = acf(eps,nlags=10)
     ax4.bar(np.arange(len(acf_))[1:],acf_[1:],color='grey')
