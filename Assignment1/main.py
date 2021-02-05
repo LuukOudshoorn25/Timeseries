@@ -34,11 +34,11 @@ def main():
     # Create Kalman filter object
     KFobj = KFclass(df, init_pars=parameters, var='volume')
     # Plot basic Kalman filtering
-    KFobj.iterate()
+    #KFobj.iterate()
     # Plot state smoothing 
-    KFobj.state_smooth()
+    #KFobj.state_smooth()
     # Plot disturbance smoothing
-    KFobj.disturbance_smoothing()
+    #KFobj.disturbance_smoothing()
     # Now with missing values
     KFobj.missing_data()
 

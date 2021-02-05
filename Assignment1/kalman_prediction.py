@@ -34,6 +34,8 @@ class KFpredictor():
             F[t] = P[t]+sigma_eps2
             P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
+        F[-1] = P[-1]+sigma_eps2
+        v[-1] = self.y[-1]-a[-1]
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
         

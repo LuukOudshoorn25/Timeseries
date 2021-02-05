@@ -13,7 +13,7 @@ def plot_raw_data(df):
 def plot_fig2_1(times, y, a, std, P, v, F,fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='black',lw=1)
-    ax1.scatter(times, y, s=1,color='black')
+    ax1.scatter(times[1:], y[1:], s=1,color='black')
     ax1.plot(times[1:], a[1:]+1.645*std[1:],color='grey',lw=0.7)
     ax1.plot(times[1:], a[1:]-1.645*std[1:],color='grey',lw=0.7)
     ax1.set_ylabel('Volume of Nile')
@@ -24,7 +24,7 @@ def plot_fig2_1(times, y, a, std, P, v, F,fname):
     ax3.plot(times[1:], v[1:],color='black',lw=1)
     ax3.set_ylabel('Prediction errors')
     
-    ax4.plot(times[1:-1], F[1:-1],color='black',lw=1)
+    ax4.plot(times[1:], F[1:],color='black',lw=1)
     ax4.set_ylabel('Prediction variance')
 
     plt.tight_layout()
@@ -35,8 +35,8 @@ def plot_fig2_2(times, y, alphas, std, V, r, N, fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], alphas[1:],color='black',lw=1)
     ax1.scatter(times, y, s=1,color='black')
-    ax1.plot(times[2:], alphas[2:]+1.645*std[1:],color='grey',lw=0.7)
-    ax1.plot(times[2:], alphas[2:]-1.645*std[1:],color='grey',lw=0.7)
+    ax1.plot(times[1:], alphas[1:]+1.645*std,color='grey',lw=0.7)
+    ax1.plot(times[1:], alphas[1:]-1.645*std,color='grey',lw=0.7)
     ax1.set_ylabel('Volume of Nile')
 
     ax2.plot(times[1:-1], V[1:-1],color='black',lw=1)
@@ -86,7 +86,7 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname):
     ax3.plot(times, y,color='black',lw=0.7)
     ax3.set_ylabel('Smoothed State')
     
-    ax4.plot(times[2:-1], V[2:-1],color='black',lw=1)
+    ax4.plot(times[1:-2], V[1:-2],color='black',lw=1)
     ax4.set_ylabel('Smoothed state Variance')
 
     plt.tight_layout()

@@ -38,13 +38,13 @@ class KFclass():
             # K is defined as ratio of P and F
             Kt = P[t]/F[t]
             v[t] = self.y[t]-a[t]
-            a_cond = a[t] + Kt*v[t]
             a[t+1] = a[t] + Kt*v[t]
-            F[t] = P[t]+sigma_eps2
-            P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
+        F[-1] = P[-1]+sigma_eps2
+        v[-1] = self.y[-1]-a[-1]        
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
+        
         if plot:
             plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
         return a, std, P, v, F
@@ -58,17 +58,17 @@ class KFclass():
         N = np.zeros(len(self.y))
         V = np.zeros(len(self.y))
         
-        for t in np.arange(len(self.y)-2,1,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             r[t-1] = v[t]/F[t]+L[t]*r[t]
-        for t in np.arange(len(self.y)-2,1,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             N[t-1] = 1/F[t] + L[t]**2*N[t]
-        for t in np.arange(len(self.y)-2,0,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
         
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]
-        for t in range(1,len(self.y)-1):
+        for t in range(1,len(self.y)):
             alphas[t] = a[t] + P[t]*r[t-1]
         alphas[-1]=np.nan
         std = np.sqrt(V)[1:]
@@ -113,9 +113,9 @@ class KFclass():
             v[t] = self.y[t]-a[t]
             a[t+1] = a[t] + np.nan_to_num(Kt*v[t])
             F[t] = P[t]+sigma_eps2
-            P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
-        
+        v[-1] = self.y[-1]-a[-1]
+        F[-1] = P[-1]+sigma_eps2
         # Obtain smoothed state
         # Obtain all time values for L
         L = self.pardict['sigma_eps2']/F
@@ -124,11 +124,11 @@ class KFclass():
         N = np.zeros(len(self.y))
         V = np.zeros(len(self.y))
         
-        for t in np.arange(len(self.y)-2,1,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             r[t-1] = v[t]/F[t]+L[t]*r[t]
-        for t in np.arange(len(self.y)-2,1,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             N[t-1] = 1/F[t] + L[t]**2*N[t]
-        for t in np.arange(len(self.y)-2,0,-1):
+        for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
         
         # Do the recursion for alpha
