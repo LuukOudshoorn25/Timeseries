@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from plottinglib import plot_fig2_1
+from plottinglib import *
 class KFclass():
     def __init__(self,df, init_pars, var='volume'):
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
@@ -36,9 +36,35 @@ class KFclass():
         std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
         return a, std, P, v, F
 
+    def state_smooth(self):
+        a, std, P, v, F = self.iterate()
+        # Obtain all time values for L
+        L = self.pardict['sigma_eps2']/F
+        # Do the recursion for r
+        r = np.zeros(len(self.y))
+        N = np.zeros(len(self.y))
+        V = np.zeros(len(self.y))
+        
+        for t in np.arange(len(self.y)-2,1,-1):
+            r[t-1] = v[t]/F[t]+L[t]*r[t]
+        for t in np.arange(len(self.y)-2,1,-1):
+            N[t-1] = 1/F[t] + L[t]**2*N[t]
+        for t in np.arange(len(self.y)-2,0,-1):
+            V[t] = P[t] - P[t]**2*N[t-1]
+        
+        # Do the recursion for alpha
+        alphas = np.zeros(len(self.y))
+        alphas[0] = a[t]
+        for t in range(1,len(self.y)-1):
+            alphas[t] = a[t] + P[t]*r[t-1]
+        alphas[-1]=np.nan
+        std = np.sqrt(V)[1:]
+        plot_fig2_2(self.times, self.y,alphas, std, V, r, N,'Fig22.pdf')
+        return alphas
+
     def run(self):
         """Caller function to run Kalman filter and to plot stuff afterwards"""
         # Run KF filter and obtain arrays
         a, std, P, v, F = self.iterate()
         # Now plot the results
-        plot_fig2_1(self.times, self.y,a, std, P, v, F)
+        plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')

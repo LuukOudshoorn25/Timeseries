@@ -30,4 +30,5 @@ parameters = {'P1':1e7,
               'sigma_eps2':15099,
               'sigma_eta2':1469.1}
 KFobj = KFclass(df, init_pars=parameters, var='volume')
-KFobj.run()
+#KFobj.run()
+KFobj.state_smooth()
