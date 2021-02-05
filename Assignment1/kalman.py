@@ -6,9 +6,18 @@ class KFclass():
     def __init__(self,df, init_pars, var='volume'):
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
            init_pars is a dictionary with initial values"""
+        self.df = df
         self.y = df[var].values.flatten()
         self.times = df.index
         self.pardict = init_pars
+
+    def reset_data(self):
+        self.y = self.df[var].values.flatten()
+    
+    def missing_data(self):
+        self.y = self.df[var].values.flatten()
+        self.y[20:40]=np.nan
+        self.y[60:80]=np.nan
        
     def iterate(self,plot=True):
         """Iterate over the observations and update the filtered values after each iteration"""
@@ -82,3 +91,34 @@ class KFclass():
 
         plot_fig2_3(self.times, eps_hat,var_eps,eta_hat, var_eta,'Fig23.pdf')
 
+    def missing_data(self,plot=True):
+        """Iterate over the observations and update the filtered values after each iteration"""
+        # Set some of the observations to missing 
+        self.missing_data()
+        # Create empty arrays to store values
+        F = np.zeros(len(self.y))
+        a = np.zeros(len(self.y))
+        v = np.zeros(len(self.y))
+        P = np.zeros(len(self.y))
+        # Initialize at the initial values parsed to the class
+        P[0] = self.pardict['P1']
+        sigma_eps2 = self.pardict['sigma_eps2']
+        sigma_eta2 = self.pardict['sigma_eta2']
+        # Iterate 
+        for t in range(0,len(self.y)-1):
+            F[t] = P[t]+sigma_eps2
+            # K is defined as ratio of P and F
+            Kt = P[t]/F[t] if 
+            v[t] = self.y[t]-a[t]
+            a_cond = a[t] + Kt*v[t]
+            a[t+1] = a[t] + Kt*v[t]
+            F[t] = P[t]+sigma_eps2
+            P_cond = P[t]*(1-Kt)
+            P[t+1] = P[t]*(1-Kt)+sigma_eta2
+        # Obtain std error of prediction form variance
+        std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
+        if plot:
+            plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
+        # Restore data
+        self.reset_data()
+        return a, std, P, v, F
