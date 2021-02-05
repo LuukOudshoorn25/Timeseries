@@ -7,17 +7,19 @@ class KFclass():
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
            init_pars is a dictionary with initial values"""
         self.df = df
-        self.y = df[var].values.flatten()
+        self.var = var
+        self.y = np.array(df[var].values.flatten())
         self.times = df.index
         self.pardict = init_pars
 
     def reset_data(self):
-        self.y = self.df[var].values.flatten()
+        self.y = self.df[self.var].values.flatten()
     
-    def missing_data(self):
-        self.y = self.df[var].values.flatten()
-        self.y[20:40]=np.nan
-        self.y[60:80]=np.nan
+    def remove_data(self):
+        self.y = np.array(self.df[self.var].values.flatten(),dtype=float)
+        self.y[20:40] = np.nan
+        self.y[60:80] = np.nan
+        
        
     def iterate(self,plot=True):
         """Iterate over the observations and update the filtered values after each iteration"""
@@ -94,7 +96,7 @@ class KFclass():
     def missing_data(self,plot=True):
         """Iterate over the observations and update the filtered values after each iteration"""
         # Set some of the observations to missing 
-        self.missing_data()
+        self.remove_data()
         # Create empty arrays to store values
         F = np.zeros(len(self.y))
         a = np.zeros(len(self.y))
@@ -108,7 +110,7 @@ class KFclass():
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
             # K is defined as ratio of P and F
-            Kt = P[t]/F[t]# if 
+            Kt = P[t]/F[t] if np.isfinite(self.y[t]) else 0
             v[t] = self.y[t]-a[t]
             a_cond = a[t] + Kt*v[t]
             a[t+1] = a[t] + Kt*v[t]
@@ -118,7 +120,7 @@ class KFclass():
         # Obtain std error of prediction form variance
         std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
         if plot:
-            plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
+            plot_fig2_5(self.times, self.y,a, std, P, v, F,'Fig25.pdf')
         # Restore data
         self.reset_data()
         return a, std, P, v, F

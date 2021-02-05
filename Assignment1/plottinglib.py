@@ -72,3 +72,22 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     plt.savefig(fname,bbox_inches='tight')
     plt.show()
 
+
+def plot_fig2_5(times, y, a, std, P, v, F,fname):
+    fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
+    ax1.plot(times[1:], a[1:],color='tomato',lw=0.7)
+    ax1.plot(times, y,color='black',lw=0.7)
+    ax1.set_ylabel('Volume of Nile')
+
+    ax2.plot(times[1:], P[1:],color='black',lw=1)
+    ax2.set_ylabel('Filtered state variance')
+
+    ax3.plot(times[1:], v[1:],color='black',lw=1)
+    ax3.set_ylabel('Prediction errors')
+    
+    ax4.plot(times[1:-1], F[1:-1],color='black',lw=1)
+    ax4.set_ylabel('Prediction variance')
+
+    plt.tight_layout()
+    plt.savefig(fname,bbox_inches='tight')
+    plt.show()
