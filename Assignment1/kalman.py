@@ -112,15 +112,35 @@ class KFclass():
             # K is defined as ratio of P and F
             Kt = P[t]/F[t] if np.isfinite(self.y[t]) else 0
             v[t] = self.y[t]-a[t]
-            a_cond = a[t] + Kt*v[t]
-            a[t+1] = a[t] + Kt*v[t]
+            a[t+1] = a[t] + np.nan_to_num(Kt*v[t])
             F[t] = P[t]+sigma_eps2
             P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
-        # Obtain std error of prediction form variance
-        std = np.sqrt((P[t]*sigma_eps2)/(P[t]+sigma_eps2))
+        
+        # Obtain smoothed state
+        # Obtain all time values for L
+        L = self.pardict['sigma_eps2']/F
+        # Do the recursion for r
+        r = np.zeros(len(self.y))
+        N = np.zeros(len(self.y))
+        V = np.zeros(len(self.y))
+        
+        for t in np.arange(len(self.y)-2,1,-1):
+            r[t-1] = v[t]/F[t]+L[t]*r[t]
+        for t in np.arange(len(self.y)-2,1,-1):
+            N[t-1] = 1/F[t] + L[t]**2*N[t]
+        for t in np.arange(len(self.y)-2,0,-1):
+            V[t] = P[t] - P[t]**2*N[t-1]
+        
+        # Do the recursion for alpha
+        alphas = np.zeros(len(self.y))
+        alphas[0] = a[t]
+        for t in range(1,len(self.y)-1):
+            alphas[t] = a[t] + np.nan_to_num(P[t]*r[t-1])
+        alphas[-1]=np.nan
+ 
         if plot:
-            plot_fig2_5(self.times, self.y,a, std, P, v, F,'Fig25.pdf')
+            plot_fig2_5(self.times, self.y,a,P,alphas,V,'Fig25.pdf')
         # Restore data
         self.reset_data()
-        return a, std, P, v, F
+        

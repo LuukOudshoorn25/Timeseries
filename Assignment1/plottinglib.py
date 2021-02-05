@@ -73,20 +73,21 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     plt.show()
 
 
-def plot_fig2_5(times, y, a, std, P, v, F,fname):
+def plot_fig2_5(times, y,a,P,alphas,V, fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='tomato',lw=0.7)
     ax1.plot(times, y,color='black',lw=0.7)
-    ax1.set_ylabel('Volume of Nile')
+    ax1.set_ylabel('Volume of Nile (filtered state)')
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)
     ax2.set_ylabel('Filtered state variance')
 
-    ax3.plot(times[1:], v[1:],color='black',lw=1)
-    ax3.set_ylabel('Prediction errors')
+    ax3.plot(times[1:], alphas[1:],color='tomato',lw=0.7)
+    ax3.plot(times, y,color='black',lw=0.7)
+    ax3.set_ylabel('Smoothed State')
     
-    ax4.plot(times[1:-1], F[1:-1],color='black',lw=1)
-    ax4.set_ylabel('Prediction variance')
+    ax4.plot(times[2:-1], V[2:-1],color='black',lw=1)
+    ax4.set_ylabel('Smoothed state Variance')
 
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
