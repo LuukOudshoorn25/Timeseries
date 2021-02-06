@@ -41,7 +41,8 @@ def main():
     #KFobj.disturbance_smoothing()
     # Now with missing values
     # KFobj.missing_data()
-    KFobj.diagnostic()
+    # KFobj.diag_predict()
+    KFobj.diag_residuals()
     # Now predictions using Kalman filter
     # Extend df with missing observations
     # df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'volume':np.ones(30)*np.nan}).set_index('year')

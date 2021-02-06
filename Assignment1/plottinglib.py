@@ -96,7 +96,7 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname):
     plt.show()
 
 
-def plot_fig2_6(times, eps, fname):
+def plot_fig2_7(times, eps, fname):
     fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
     ax1.plot(times[1:], eps[1:], color='black', lw=0.7)
     ax1.plot(times[1:], np.zeros(len(eps)-1), color='black', lw=0.7)
@@ -111,6 +111,25 @@ def plot_fig2_6(times, eps, fname):
     ax4.axhline(0,ls='--',color='black',lw=0.5)
     ax4.set_ylim(-1,1)
     
+    plt.tight_layout()
+    plt.savefig(fname, bbox_inches='tight')
+    plt.show()
+
+
+def plot_fig2_8(times, obs_res, stat_res, fname):
+    fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
+    ax1.plot(times[1:], obs_res[1:], color='black', lw=0.7)
+    ax1.plot(times[1:], np.zeros(len(obs_res) - 1), color='black', lw=0.7)
+    sns.distplot(obs_res, hist=True, bins=13, kde=True, color='darkblue',
+                 hist_kws={'edgecolor': 'black'},
+                 kde_kws={'linewidth': 0.7}, ax=ax2)
+
+    ax3.plot(times[1:], stat_res[1:], color='black', lw=0.7)
+    ax3.plot(times[1:], np.zeros(len(stat_res) - 1), color='black', lw=0.7)
+    sns.distplot(stat_res, hist=True, bins=13, kde=True, color='darkblue',
+                 hist_kws={'edgecolor': 'black'},
+                 kde_kws={'linewidth': 0.7}, ax=ax4)
+
     plt.tight_layout()
     plt.savefig(fname, bbox_inches='tight')
     plt.show()
