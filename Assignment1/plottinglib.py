@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import statsmodels.api as sm 
 from statsmodels.tsa.stattools import acf
 def plot_raw_data(df):
@@ -99,8 +100,10 @@ def plot_fig2_6(times, eps, fname):
     fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
     ax1.plot(times[1:], eps[1:], color='black', lw=0.7)
     ax1.plot(times[1:], np.zeros(len(eps)-1), color='black', lw=0.7)
-    ax2.hist(eps, lw=1, bins=14, fill=False,density=True)
-    sm.qqplot(eps, line ='45', ax=ax3,ms=0,lw=1,ls='solid' )
+    sns.distplot(eps, hist=True, bins=13, kde=True, color='darkblue',
+                 hist_kws={'edgecolor': 'black'},
+                 kde_kws={'linewidth': 0.7}, ax=ax2)
+    sm.qqplot(eps, line ='45', ax=ax3,ms=0,lw=0.5 )
     ax3.set_ylabel('')
     
     acf_ = acf(eps,nlags=10)
