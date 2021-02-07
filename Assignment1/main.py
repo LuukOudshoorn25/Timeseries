@@ -33,22 +33,26 @@ def main():
                 'sigma_eta2':1469.1}
     # Create Kalman filter object
     KFobj = KFclass(df, init_pars=parameters, var='volume')
-    # Plot basic Kalman filtering
-    #KFobj.iterate()
-    # Plot state smoothing 
-    #KFobj.state_smooth()
-    # Plot disturbance smoothing
-    #KFobj.disturbance_smoothing()
-    # Now with missing values
-    # KFobj.missing_data()
-    KFobj.diag_predict()
-    #KFobj.diag_residuals()
+    # Plot basic Kalman filtering (fig1)
+    KFobj.iterate()
+    # Plot state smoothing  (fig2)
+    KFobj.state_smooth()
+    # Plot disturbance smoothing (fig3)
+    KFobj.disturbance_smoothing()
+    # Now with missing values (fig4)
+    KFobj.missing_data()
     # Now predictions using Kalman filter
     # Extend df with missing observations
-    # df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'volume':np.ones(30)*np.nan}).set_index('year')
-    # df_extended = pd.concat((df, df_ext))
-    # KFpred = KFpredictor(df_extended, init_pars=parameters, var='volume')
-    # KFpred.iterate()
+    df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'volume':np.ones(30)*np.nan}).set_index('year')
+    df_extended = pd.concat((df, df_ext))
+    # fig 5
+    KFpred = KFpredictor(df_extended, init_pars=parameters, var='volume')
+    KFpred.iterate()
+    # Fig 6
+    KFobj = KFclass(df, init_pars=parameters, var='volume')
+    KFobj.diag_predict()
+    # Fig 7
+    KFobj.diag_residuals()
 
 
 if __name__ == "__main__":
