@@ -147,7 +147,6 @@ class KFclass():
         a, std, P, v, F = self.iterate(plot=False)
         # obtain standardised forecast errors
         eps = v/np.sqrt(F)
-        print(eps, self.times)
         if plot:
             plot_fig2_7(self.times, eps, 'Fig27.pdf')
 

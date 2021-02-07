@@ -103,9 +103,9 @@ def plot_fig2_7(times, eps, fname):
     sns.distplot(eps, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax2)
-    sm.qqplot(eps, line ='45', ax=ax3,ms=0,lw=0.5 )
-    ax3.set_ylabel('')
     
+    sm.qqplot(eps, line ='45', ax=ax3,ms=1,lw=0.1)
+    ax3.set_ylabel('')
     acf_ = acf(eps,nlags=10)
     ax4.bar(np.arange(len(acf_))[1:],acf_[1:],color='grey')
     ax4.axhline(0,ls='--',color='black',lw=0.5)
