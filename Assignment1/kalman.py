@@ -44,7 +44,7 @@ class KFclass():
         v[-1] = self.y[-1]-a[-1]        
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
-        
+        print(np.mean(v))
         if plot:
             plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
         return a, std, P, v, F

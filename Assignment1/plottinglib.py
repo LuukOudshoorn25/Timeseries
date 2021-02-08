@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import statsmodels.api as sm 
 from statsmodels.tsa.stattools import acf
+
+def make_titles(axes):
+    for i in range(len(axes)):
+        axes[i].set_title('('+str(i+1)+')   ',loc='right')
+    return axes
+
+
 def plot_raw_data(df):
     plt.figure()
     plt.scatter(df.index, df.volume,s=2,color='black')
@@ -19,16 +26,21 @@ def plot_fig2_1(times, y, a, std, P, v, F,fname):
     ax1.plot(times[1:], a[1:]+1.645*std[1:],color='grey',lw=0.7)
     ax1.plot(times[1:], a[1:]-1.645*std[1:],color='grey',lw=0.7)
     ax1.set_ylabel('Volume of Nile')
+    
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)
     ax2.set_ylabel('Filtered state variance')
+    
 
     ax3.plot(times[1:], v[1:],color='black',lw=1)
     ax3.set_ylabel('Prediction errors')
     
+
     ax4.plot(times[1:], F[1:],color='black',lw=1)
     ax4.set_ylabel('Prediction variance')
-
+    
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
+    
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
     plt.show()
@@ -50,6 +62,8 @@ def plot_fig2_2(times, y, alphas, std, V, r, N, fname):
     
     ax4.plot(times[:-1], N[:-1],color='black',lw=1)
     ax4.set_ylabel('Smoothing variance cumulant')
+    
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
 
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
@@ -60,6 +74,7 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     ax1.plot(times, eps_hat,color='black',lw=1)
     ax1.set_ylabel('Observation error')
 
+
     ax2.plot(times[1:], np.sqrt(var_eps[1:]),color='black',lw=1)
     ax2.set_ylabel('Observation error variance')
 
@@ -69,6 +84,8 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     
     ax4.plot(times, np.sqrt(var_eta),color='black',lw=1)
     ax4.set_ylabel('State error variance')
+
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
 
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
@@ -91,6 +108,8 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname):
     ax4.plot(times[1:-2], V[1:-2],color='black',lw=1)
     ax4.set_ylabel('Smoothed state Variance')
 
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
+
     plt.tight_layout()
     plt.savefig(fname,bbox_inches='tight')
     plt.show()
@@ -111,6 +130,8 @@ def plot_fig2_7(times, eps, fname):
     ax4.axhline(0,ls='--',color='black',lw=0.5)
     ax4.set_ylim(-1,1)
     
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
+
     plt.tight_layout()
     plt.savefig(fname, bbox_inches='tight')
     plt.show()
@@ -129,6 +150,8 @@ def plot_fig2_8(times, obs_res, stat_res, fname):
     sns.distplot(stat_res, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax4)
+
+    ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])                 
 
     plt.tight_layout()
     plt.savefig(fname, bbox_inches='tight')
