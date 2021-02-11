@@ -16,6 +16,10 @@ def plot_raw_data(df, var_name='Volume of Nile'):
     plt.tight_layout()
     plt.xlabel('Year')
     plt.ylabel(var_name)
+    plt.tight_layout()
+
+    fname = var_name + 'raw_data.pdf'
+    plt.savefig(fname, bbox_inches='tight')
     plt.show()
 
 def plot_fig2_1(times, y, a, std, P, v, F,fname, var_name='Volume of Nile'):

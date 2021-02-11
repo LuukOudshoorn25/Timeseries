@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize, approx_fprime
 from plottinglib import *
 class KFclass():
     def __init__(self,df, init_pars, var='dep_var', var_name='Volume of Nile'):
@@ -12,6 +13,34 @@ class KFclass():
         self.y = np.array(df[var].values.flatten())
         self.times = df.index
         self.pardict = init_pars
+        self.options = {'eps':1e-09,
+                      'maxiter':2000}
+
+    def __llik_fun__(self, par_ini):
+        # likelihood function of state space model
+        n = len(self.y)
+        _, __, ___, v, F, r = self.iterate(plot=False, estimate=True, init_params=par_ini)
+        L = -(n/2)*np.log(2*np.pi) - 0.5*(np.log(F) + (v**2/F))
+        llik = np.mean(L)
+        return -1*llik
+
+    def fit_model(self):
+        # Initialize at the initial values parsed to the class
+        P = self.pardict['P1']
+        sigma_eps2 = self.pardict['sigma_eps2']
+        sigma_eta2 = self.pardict['sigma_eta2']
+
+        par_ini = [P, sigma_eps2, sigma_eta2]
+        # minimize the likelihood function
+        Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
+        est = minimize(self.__llik_fun__, x0=par_ini,
+                       options = self.options,
+                       method='Newton-CG',
+                       jac=Lprime,
+                      )
+        self.pardict['P1'] = est.x[0]
+        self.pardict['sigma_eps2'] = est.x[1]
+        self.pardict['sigma_eta2'] = est.x[2]
 
     def reset_data(self):
         self.y = self.df[self.var].values.flatten()
@@ -20,19 +49,25 @@ class KFclass():
         self.y = np.array(self.df[self.var].values.flatten(),dtype=float)
         self.y[20:40] = np.nan
         self.y[60:80] = np.nan
-        
-       
-    def iterate(self,plot=True):
+
+    def iterate(self,plot=True, estimate=False, init_params=None):
         """Iterate over the observations and update the filtered values after each iteration"""
         # Create empty arrays to store values
         F = np.zeros(len(self.y))
         a = np.zeros(len(self.y))
         v = np.zeros(len(self.y))
         P = np.zeros(len(self.y))
+        r = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
-        P[0] = self.pardict['P1']
-        sigma_eps2 = self.pardict['sigma_eps2']
-        sigma_eta2 = self.pardict['sigma_eta2']
+        if estimate == True:
+            P[0] = init_params[0]
+            sigma_eps2 = init_params[1]
+            sigma_eta2 = init_params[2]
+            a[0] = self.y[0] #+ sigma_eps2*r[0]
+        else:
+            P[0] = self.pardict['P1']
+            sigma_eps2 = self.pardict['sigma_eps2']
+            sigma_eta2 = self.pardict['sigma_eta2']
         # Iterate 
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
@@ -42,17 +77,22 @@ class KFclass():
             a[t+1] = a[t] + Kt*v[t]
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         F[-1] = P[-1]+sigma_eps2
-        v[-1] = self.y[-1]-a[-1]        
+        v[-1] = self.y[-1]-a[-1]
+        if estimate == True:
+            # Obtain all time values for L
+            L = self.pardict['sigma_eps2']/F
+            # Do the recursion for r - which is needed for estimation
+            for t in np.arange(len(self.y)-1,0,-1):
+                r[t-1] = v[t]/F[t]+L[t]*r[t]
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
-        print(np.mean(v))
         if plot:
             fig_name = self.var_name + 'Fig21.pdf'
             plot_fig2_1(self.times, self.y,a, std, P, v, F, fname=fig_name, var_name=self.var_name)
-        return a, std, P, v, F
+        return a, std, P, v, F, r
 
     def state_smooth(self,plot=True):
-        a, std, P, v, F = self.iterate(plot=False)
+        a, std, P, v, F, _ = self.iterate(plot=False)
         # Obtain all time values for L
         L = self.pardict['sigma_eps2']/F
         # Do the recursion for r
@@ -80,7 +120,7 @@ class KFclass():
         return alphas, N
 
     def disturbance_smoothing(self):
-        a, std, P, v, F = self.iterate(plot=False)
+        a, std, P, v, F, _ = self.iterate(plot=False)
         # Obtain alpha hats
         alphas, N = self.state_smooth(plot=False)
         # Obtain Observation error
@@ -150,7 +190,7 @@ class KFclass():
         self.reset_data()
 
     def diag_predict(self, plot=True):
-        a, std, P, v, F = self.iterate(plot=False)
+        a, std, P, v, F, _ = self.iterate(plot=False)
         # obtain standardised forecast errors
         eps = v/np.sqrt(F)
         if plot:
@@ -158,7 +198,7 @@ class KFclass():
             plot_fig2_7(self.times, eps, fname=fig_name)
 
     def diag_residuals(self, plot=True):
-        a, std, P, v, F = self.iterate(plot=False)
+        a, std, P, v, F, _ = self.iterate(plot=False)
         # Obtain alpha hats
         alphas, N = self.state_smooth(plot=False)
         # Obtain Observation error

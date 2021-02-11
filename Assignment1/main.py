@@ -28,13 +28,16 @@ def main():
     # plot_raw_data(df, var_name='Temperature Bilt')
 
     # Run Kalman filter and reproduce fig 2.1
-    parameters = {'P1': 1e7,
-                  'sigma_eps2': 15099,
-                  'sigma_eta2': 1469.1}
+    init_parameters = {'P1': 31.07320341,
+                  'sigma_eps2': 85.2698937,
+                  'sigma_eta2': 195.03523569}
     # Create Kalman filter object
-    KFobj = KFclass(df, init_pars=parameters, var='dep_var', var_name='Temperature Bilt')
+    KFobj = KFclass(df, init_pars=init_parameters, var='dep_var', var_name='Temperature Bilt')
+    KFobj.fit_model()
     # Plot basic Kalman filtering (fig1)
     KFobj.iterate()
+    # Plot state smoothing  (fig2)
+    # KFobj.state_smooth()
 
 
 def nile_data():
