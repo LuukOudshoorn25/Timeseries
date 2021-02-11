@@ -3,11 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from plottinglib import *
 class KFclass():
-    def __init__(self,df, init_pars, var='volume'):
+    def __init__(self,df, init_pars, var='dep_var', var_name='Volume of Nile'):
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
            init_pars is a dictionary with initial values"""
         self.df = df
         self.var = var
+        self.var_name = var_name
         self.y = np.array(df[var].values.flatten())
         self.times = df.index
         self.pardict = init_pars
@@ -46,7 +47,8 @@ class KFclass():
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
         print(np.mean(v))
         if plot:
-            plot_fig2_1(self.times, self.y,a, std, P, v, F,'Fig21.pdf')
+            fig_name = self.var_name + 'Fig21.pdf'
+            plot_fig2_1(self.times, self.y,a, std, P, v, F, fname=fig_name, var_name=self.var_name)
         return a, std, P, v, F
 
     def state_smooth(self,plot=True):

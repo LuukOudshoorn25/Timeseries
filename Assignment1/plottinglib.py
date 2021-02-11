@@ -10,22 +10,21 @@ def make_titles(axes):
         axes[i].set_title('('+str(i+1)+')   ',loc='right')
     return axes
 
-
-def plot_raw_data(df):
+def plot_raw_data(df, var_name='Volume of Nile'):
     plt.figure()
-    plt.scatter(df.index, df.volume,s=2,color='black')
+    plt.scatter(df.index, df.dep_var,s=2,color='black')
     plt.tight_layout()
     plt.xlabel('Year')
-    plt.ylabel('Volume of Nile')
+    plt.ylabel(var_name)
     plt.show()
 
-def plot_fig2_1(times, y, a, std, P, v, F,fname):
+def plot_fig2_1(times, y, a, std, P, v, F,fname, var_name='Volume of Nile'):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='black',lw=1)
     ax1.scatter(times[1:], y[1:], s=1,color='black')
     ax1.plot(times[1:], a[1:]+1.645*std[1:],color='grey',lw=0.7)
     ax1.plot(times[1:], a[1:]-1.645*std[1:],color='grey',lw=0.7)
-    ax1.set_ylabel('Volume of Nile')
+    ax1.set_ylabel(var_name)
     
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from plottinglib import *
 class KFpredictor():
-    def __init__(self,df, init_pars, var='volume'):
+    def __init__(self,df, init_pars, var='dep_var'):
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
            init_pars is a dictionary with initial values"""
         self.df = df
