@@ -44,13 +44,13 @@ def plot_fig2_1(times, y, a, std, P, v, F,fname, var_name='Volume of Nile'):
     plt.savefig(fname,bbox_inches='tight')
     plt.show()
 
-def plot_fig2_2(times, y, alphas, std, V, r, N, fname):
+def plot_fig2_2(times, y, alphas, std, V, r, N, fname, var_name='Volume of Nile'):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], alphas[1:],color='black',lw=1)
     ax1.scatter(times, y, s=1,color='black')
     ax1.plot(times[1:], alphas[1:]+1.645*std,color='grey',lw=0.7)
     ax1.plot(times[1:], alphas[1:]-1.645*std,color='grey',lw=0.7)
-    ax1.set_ylabel('Volume of Nile')
+    ax1.set_ylabel(var_name)
 
     ax2.plot(times[1:-1], V[1:-1],color='black',lw=1)
     ax2.set_ylabel('Smoothed state variance')
@@ -91,11 +91,12 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     plt.show()
 
 
-def plot_fig2_5(times, y,a,P,alphas,V, fname):
+def plot_fig2_5(times, y,a,P,alphas,V, fname, var_name='Volume of Nile'):
+    ylabel_name = var_name + ' (filtered state)'
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='tomato',lw=0.7)
     ax1.plot(times, y,color='black',lw=0.7)
-    ax1.set_ylabel('Volume of Nile (filtered state)')
+    ax1.set_ylabel(ylabel_name)
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)
     ax2.set_ylabel('Filtered state variance')

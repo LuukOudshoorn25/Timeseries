@@ -75,7 +75,8 @@ class KFclass():
         alphas[-1]=np.nan
         std = np.sqrt(V)[1:]
         if plot:
-            plot_fig2_2(self.times, self.y,alphas, std, V, r, N,'Fig22.pdf')
+            fig_name = self.var_name + 'Fig22.pdf'
+            plot_fig2_2(self.times, self.y,alphas, std, V, r, N, fname=fig_name, var_name=self.var_name)
         return alphas, N
 
     def disturbance_smoothing(self):
@@ -92,7 +93,9 @@ class KFclass():
         var_eta = self.pardict['sigma_eta2'] - self.pardict['sigma_eta2']**2*N
         # Obtain Observation error variance
         var_eps = self.pardict['sigma_eps2'] - (self.pardict['sigma_eps2']**2)*D
-        plot_fig2_3(self.times, eps_hat,var_eps,eta_hat, var_eta,'Fig23.pdf')
+
+        fig_name = self.var_name + 'Fig23.pdf'
+        plot_fig2_3(self.times, eps_hat,var_eps,eta_hat, var_eta, fname=fig_name)
 
     def missing_data(self,plot=True):
         """Iterate over the observations and update the filtered values after each iteration"""
@@ -141,7 +144,8 @@ class KFclass():
         alphas[-1]=np.nan
  
         if plot:
-            plot_fig2_5(self.times, self.y,a,P,alphas,V,'Fig25.pdf')
+            fig_name = self.var_name + 'Fig25.pdf'
+            plot_fig2_5(self.times, self.y,a,P,alphas,V,fname=fig_name, var_name=self.var_name)
         # Restore data
         self.reset_data()
 
@@ -150,7 +154,8 @@ class KFclass():
         # obtain standardised forecast errors
         eps = v/np.sqrt(F)
         if plot:
-            plot_fig2_7(self.times, eps, 'Fig27.pdf')
+            fig_name = self.var_name + 'Fig27.pdf'
+            plot_fig2_7(self.times, eps, fname=fig_name)
 
     def diag_residuals(self, plot=True):
         a, std, P, v, F = self.iterate(plot=False)
@@ -171,4 +176,5 @@ class KFclass():
         stat_res = eta_hat/np.sqrt(var_eta)
 
         if plot:
-            plot_fig2_8(self.times, obs_res, stat_res, 'Fig28.pdf')
+            fig_name = self.var_name + 'Fig28.pdf'
+            plot_fig2_8(self.times, obs_res, stat_res, fname=fig_name)
