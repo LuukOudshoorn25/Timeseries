@@ -103,7 +103,7 @@ def nile_data():
 
 
 def main():
-    nile_data()
+    # nile_data()
     bilt_data()
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ class KFclass():
     def __llik_fun__(self, par_ini):
         # likelihood function of state space model
         n = len(self.y)
-        _, __, ___, v, F, r = self.iterate(plot=False, estimate=True, init_params=par_ini)
+        _, __, ___, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
         L = -(n/2)*np.log(2*np.pi) - 0.5*(np.log(F) + (v**2/F))
         llik = np.mean(L)
         return -1*llik
@@ -55,7 +55,6 @@ class KFclass():
         a = np.zeros(len(self.y))
         v = np.zeros(len(self.y))
         P = np.zeros(len(self.y))
-        r = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
         if estimate == True:
             sigma_eps2 = init_params[0]
@@ -85,10 +84,10 @@ class KFclass():
         if plot:
             fig_name = self.var_name + 'Fig21.pdf'
             plot_fig2_1(self.times, self.y,a, std, P, v, F, fname=fig_name, var_name=self.var_name)
-        return a, std, P, v, F, r
+        return a, std, P, v, F
 
     def state_smooth(self,plot=True):
-        a, std, P, v, F, _ = self.iterate(plot=False)
+        a, std, P, v, F = self.iterate(plot=False)
         # Obtain all time values for L
         L = self.pardict['sigma_eps2']/F
         # Do the recursion for r
@@ -116,7 +115,7 @@ class KFclass():
         return alphas, N
 
     def disturbance_smoothing(self):
-        a, std, P, v, F, _ = self.iterate(plot=False)
+        a, std, P, v, F = self.iterate(plot=False)
         # Obtain alpha hats
         alphas, N = self.state_smooth(plot=False)
         # Obtain Observation error
@@ -189,7 +188,7 @@ class KFclass():
         self.reset_data()
 
     def diag_predict(self, plot=True):
-        a, std, P, v, F, _ = self.iterate(plot=False)
+        a, std, P, v, F = self.iterate(plot=False)
         # obtain standardised forecast errors
         eps = v/np.sqrt(F)
         if plot:
@@ -197,7 +196,7 @@ class KFclass():
             plot_fig2_7(self.times, eps, fname=fig_name)
 
     def diag_residuals(self, plot=True):
-        a, std, P, v, F, _ = self.iterate(plot=False)
+        a, std, P, v, F = self.iterate(plot=False)
         # Obtain alpha hats
         alphas, N = self.state_smooth(plot=False)
         # Obtain Observation error
