@@ -21,6 +21,8 @@ def bilt_data():
     df = df.resample('1Y').mean()
     df = df[:-1]
     # Define years as index
+    # Set matplotlib style for fancy plotting
+    plt.style.use('MNRAS_stylesheet')
     df['year'] = np.arange(1901,1901+len(df.index),1)
     df = df.set_index('year')
 
