@@ -28,9 +28,9 @@ def main():
     # plot_raw_data(df, var_name='Temperature Bilt')
 
     # Run Kalman filter and reproduce fig 2.1
-    init_parameters = {'P1': 31.07320341,
-                  'sigma_eps2': 85.2698937,
-                  'sigma_eta2': 195.03523569}
+    init_parameters = {'P1': np.var(df.dep_var),
+                  'sigma_eps2': np.var(df.dep_var),
+                  'sigma_eta2': np.var(df.dep_var)}
     # Create Kalman filter object
     KFobj = KFclass(df, init_pars=init_parameters, var='dep_var', var_name='Temperature Bilt')
     KFobj.fit_model()

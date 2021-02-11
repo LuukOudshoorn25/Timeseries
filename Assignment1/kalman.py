@@ -60,15 +60,17 @@ class KFclass():
         r = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
         if estimate == True:
-            P[0] = init_params[0]
             sigma_eps2 = init_params[1]
             sigma_eta2 = init_params[2]
-            a[0] = self.y[0] #+ sigma_eps2*r[0]
         else:
             P[0] = self.pardict['P1']
             sigma_eps2 = self.pardict['sigma_eps2']
             sigma_eta2 = self.pardict['sigma_eta2']
-        # Iterate 
+        # initialise P and a if params not given
+        if self.var_name != 'Volume of Nile':
+            P[0] = sigma_eps2
+            a[0] = self.y[0]  # + sigma_eps2*r[0]
+        # Iterate
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
             # K is defined as ratio of P and F
@@ -78,12 +80,7 @@ class KFclass():
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         F[-1] = P[-1]+sigma_eps2
         v[-1] = self.y[-1]-a[-1]
-        if estimate == True:
-            # Obtain all time values for L
-            L = self.pardict['sigma_eps2']/F
-            # Do the recursion for r - which is needed for estimation
-            for t in np.arange(len(self.y)-1,0,-1):
-                r[t-1] = v[t]/F[t]+L[t]*r[t]
+
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
         if plot:
