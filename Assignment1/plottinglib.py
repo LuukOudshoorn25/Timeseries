@@ -99,7 +99,7 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname, var_name='Volume of Nile'):
     ylabel_name = var_name + ' (filtered state)'
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times[1:], a[1:],color='tomato',lw=0.7)
-    ax1.plot(times, y,color='black',lw=0.7)
+    ax1.plot(times, y, color='black',lw=0.7)
     ax1.set_ylabel(ylabel_name)
 
     ax2.plot(times[1:], P[1:],color='black',lw=1)

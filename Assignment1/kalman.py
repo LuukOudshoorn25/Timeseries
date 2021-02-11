@@ -26,21 +26,19 @@ class KFclass():
 
     def fit_model(self):
         # Initialize at the initial values parsed to the class
-        P = self.pardict['P1']
         sigma_eps2 = self.pardict['sigma_eps2']
         sigma_eta2 = self.pardict['sigma_eta2']
 
-        par_ini = [P, sigma_eps2, sigma_eta2]
+        par_ini = [sigma_eps2, sigma_eta2]
         # minimize the likelihood function
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
         est = minimize(self.__llik_fun__, x0=par_ini,
                        options = self.options,
-                       method='Newton-CG',
-                       jac=Lprime,
-                      )
+                       method='SLSQP', bounds=((0,100),(0,100)), jac=Lprime)
         self.pardict['P1'] = est.x[0]
-        self.pardict['sigma_eps2'] = est.x[1]
-        self.pardict['sigma_eta2'] = est.x[2]
+        self.pardict['sigma_eps2'] = est.x[0]
+        self.pardict['sigma_eta2'] = est.x[1]
+        print(est.x)
 
     def reset_data(self):
         self.y = self.df[self.var].values.flatten()
@@ -60,16 +58,16 @@ class KFclass():
         r = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
         if estimate == True:
-            sigma_eps2 = init_params[1]
-            sigma_eta2 = init_params[2]
+            sigma_eps2 = init_params[0]
+            sigma_eta2 = init_params[1]
+            P[0] = sigma_eps2
         else:
             P[0] = self.pardict['P1']
             sigma_eps2 = self.pardict['sigma_eps2']
             sigma_eta2 = self.pardict['sigma_eta2']
-        # initialise P and a if params not given
+        # initialise a for estimated model
         if self.var_name != 'Volume of Nile':
-            P[0] = sigma_eps2
-            a[0] = self.y[0]  # + sigma_eps2*r[0]
+            a[0] = self.y[0]
         # Iterate
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
@@ -83,6 +81,7 @@ class KFclass():
 
         # Obtain std error of prediction form variance
         std = np.sqrt((P*sigma_eps2)/(P+sigma_eps2))
+
         if plot:
             fig_name = self.var_name + 'Fig21.pdf'
             plot_fig2_1(self.times, self.y,a, std, P, v, F, fname=fig_name, var_name=self.var_name)
@@ -147,6 +146,9 @@ class KFclass():
         P[0] = self.pardict['P1']
         sigma_eps2 = self.pardict['sigma_eps2']
         sigma_eta2 = self.pardict['sigma_eta2']
+        # initialise a for estimated model
+        if self.var_name != 'Volume of Nile':
+            a[0] = self.y[0]
         # Iterate 
         for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
