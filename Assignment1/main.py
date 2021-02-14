@@ -13,6 +13,9 @@ from kalman import KFclass
 from kalman_prediction import *
 
 def bilt_data():
+    # Set matplotlib style for fancy plotting
+    plt.style.use('MNRAS_stylesheet')
+
     # Load Data
     df = pd.read_excel('temperatures_Bilt.xlsx', header=0)
     df = df.rename(columns={' TG_hom': 'dep_var', 'YYYYMMDD': 'times'})
@@ -83,11 +86,11 @@ def nile_data():
     # Create Kalman filter object
     KFobj = KFclass(df, init_pars=parameters, var='dep_var')
     # Plot basic Kalman filtering (fig1)
-    KFobj.iterate()
+    # KFobj.iterate()
     # Plot state smoothing  (fig2)
-    KFobj.state_smooth()
+    # KFobj.state_smooth()
     # Plot disturbance smoothing (fig3)
-    KFobj.disturbance_smoothing()
+    # KFobj.disturbance_smoothing()
     # Now with missing values (fig5)
     KFobj.missing_data()
     # Now predictions using Kalman filter
@@ -105,8 +108,8 @@ def nile_data():
 
 
 def main():
-    # nile_data()
-    bilt_data()
+    nile_data()
+    # bilt_data()
 
 if __name__ == "__main__":
     main()

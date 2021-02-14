@@ -107,10 +107,10 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname, var_name='Volume of Nile'):
 
     ax3.plot(times[1:], alphas[1:],color='tomato',lw=0.7)
     ax3.plot(times, y,color='black',lw=0.7)
-    ax3.set_ylabel('Smoothed State')
+    ax3.set_ylabel('Smoothed state')
     
     ax4.plot(times[1:-2], V[1:-2],color='black',lw=1)
-    ax4.set_ylabel('Smoothed state Variance')
+    ax4.set_ylabel('Smoothed state variance')
 
     ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
 

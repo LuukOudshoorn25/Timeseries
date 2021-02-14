@@ -33,10 +33,8 @@ class KFpredictor():
             # K is defined as ratio of P and F
             Kt = P[t]/F[t] if np.isfinite(self.y[t]) else 0
             v[t] = self.y[t]-a[t]
-            a_cond = a[t] + np.nan_to_num(Kt*v[t])
             a[t+1] = a[t] + np.nan_to_num(Kt*v[t])
             F[t] = P[t]+sigma_eps2
-            P_cond = P[t]*(1-Kt)
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         F[-1] = P[-1]+sigma_eps2
         v[-1] = self.y[-1]-a[-1]
