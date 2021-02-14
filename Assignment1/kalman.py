@@ -97,11 +97,11 @@ class KFclass():
 
         for t in np.arange(len(self.y)-1,-1,-1):
             r[t-1] = v[t]/F[t]+L[t]*r[t]
-        for t in np.arange(len(self.y)-1,0,-1):
+        for t in np.arange(len(self.y)-2,0,-1):
             N[t-1] = 1/F[t] + L[t]**2*N[t]
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
-        print(V[0])
+
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]
@@ -182,7 +182,7 @@ class KFclass():
             N[t-1] = 1/F[t] + L[t]**2*N[t]
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
-        print(F[index_missing], F)
+
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]

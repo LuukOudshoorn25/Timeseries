@@ -56,7 +56,7 @@ def plot_fig2_2(times, y, alphas, std, V, r, N, fname, var_name='Volume of Nile'
     ax1.plot(times[1:], alphas[1:]-1.645*std,color='grey',lw=0.7)
     ax1.set_ylabel(var_name)
 
-    ax2.plot(times, V,color='black',lw=1)
+    ax2.plot(times[1:], V[1:],color='black',lw=1)
     ax2.set_ylabel('Smoothed state variance')
 
     ax3.plot(times, r,color='black',lw=1)
