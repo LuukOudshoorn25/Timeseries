@@ -121,7 +121,14 @@ class KFclass():
         # Obtain Observation error
         eps_hat = self.y-alphas
         # Obtain State error
-        eta_hat = np.roll(alphas,-1)-alphas
+        # Do the recursion for r
+        r = np.zeros(len(self.y))
+        # Obtain all time values for L
+        L = self.pardict['sigma_eps2']/F
+        for t in np.arange(len(self.y) - 1, 0, -1):
+            r[t - 1] = v[t] / F[t] + L[t] * r[t]
+
+        eta_hat = self.pardict['sigma_eta2']*r
         # Obtain D
         D = 1/F + N*(P/F)**2
         # Obtain State error variance
