@@ -76,9 +76,10 @@ def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
     ax1.plot(times, eps_hat,color='black',lw=1)
     ax1.set_ylabel('Observation error')
+    ax1.axhline(0,ls='--',lw=0.5,color='black')
 
 
-    ax2.plot(times[1:], np.sqrt(var_eps[1:]),color='black',lw=1)
+    ax2.plot(times, np.sqrt(var_eps),color='black',lw=1)
     ax2.set_ylabel('Observation error variance')
 
     ax3.plot(times, eta_hat,color='black',lw=1)

@@ -203,29 +203,21 @@ class KFclass():
         # Obtain alpha hats
         alphas, N = self.state_smooth(plot=False)
         # Obtain Observation error
-        eps_hat = self.y-alphas
-        # Obtain State error
-        eta_hat = np.roll(alphas,-1)-alphas
+
         # Obtain D
         D = 1/F + N*(P/F)**2
         # Obtain State error variance
-        var_eta = self.pardict['sigma_eta2'] - self.pardict['sigma_eta2']**2*N
-        # Obtain Observation error variance
-        var_eps = self.pardict['sigma_eps2'] - (self.pardict['sigma_eps2']**2)*D
 
-        # Obtain smoothed state
         # Obtain all time values for L
         L = self.pardict['sigma_eps2'] / F
-
         # Do the recursion for r
         r = np.zeros(len(self.y))
-
         for t in np.arange(len(self.y)-1,0,-1):
             r[t-1] = v[t]/F[t]+L[t]*r[t]
 
         K = P[t] / F[t]
         u = v/F - K*r
-
+        # obtain standardised smoothed residuals
         obs_res = u/np.sqrt(D)
         stat_res = r/np.sqrt(N)
 
