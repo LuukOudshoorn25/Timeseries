@@ -181,7 +181,7 @@ class KFclass():
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]
         for t in range(1,len(self.y)-1):
-            alphas[t] = a[t] + np.nan_to_num(P[t]*r[t-1])
+            alphas[t] = a[t] + P[t]*r[t-1]
         alphas[-1]=np.nan
  
         if plot:
@@ -213,8 +213,21 @@ class KFclass():
         # Obtain Observation error variance
         var_eps = self.pardict['sigma_eps2'] - (self.pardict['sigma_eps2']**2)*D
 
-        obs_res = eps_hat/np.sqrt(var_eps)
-        stat_res = eta_hat/np.sqrt(var_eta)
+        # Obtain smoothed state
+        # Obtain all time values for L
+        L = self.pardict['sigma_eps2'] / F
+
+        # Do the recursion for r
+        r = np.zeros(len(self.y))
+
+        for t in np.arange(len(self.y)-1,0,-1):
+            r[t-1] = v[t]/F[t]+L[t]*r[t]
+
+        K = P[t] / F[t]
+        u = v/F - K*r
+
+        obs_res = u/np.sqrt(D)
+        stat_res = r/np.sqrt(N)
 
         if plot:
             fig_name = self.var_name + 'Fig28.pdf'

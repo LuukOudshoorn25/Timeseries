@@ -92,17 +92,17 @@ def nile_data():
     # Plot disturbance smoothing (fig3)
     # KFobj.disturbance_smoothing()
     # Now with missing values (fig5)
-    KFobj.missing_data()
+    # KFobj.missing_data()
     # Now predictions using Kalman filter
     # Extend df with missing observations
     df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'dep_var':np.ones(30)*np.nan}).set_index('year')
     df_extended = pd.concat((df, df_ext))
     # fig 6
-    KFpred = KFpredictor(df_extended, init_pars=parameters, var='dep_var')
-    KFpred.iterate()
+    # KFpred = KFpredictor(df_extended, init_pars=parameters, var='dep_var')
+    # KFpred.iterate()
     # Fig 7
     KFobj = KFclass(df, init_pars=parameters, var='dep_var')
-    KFobj.diag_predict()
+    # KFobj.diag_predict()
     # Fig 8
     KFobj.diag_residuals()
 

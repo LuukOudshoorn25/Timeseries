@@ -143,14 +143,14 @@ def plot_fig2_7(times, eps, fname):
 
 def plot_fig2_8(times, obs_res, stat_res, fname):
     fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
-    ax1.plot(times[1:], obs_res[1:], color='black', lw=0.7)
-    ax1.plot(times[1:], np.zeros(len(obs_res) - 1), color='black', lw=0.7)
+    ax1.plot(times, obs_res, color='black', lw=0.7)
+    ax1.plot(times, np.zeros(len(obs_res)), color='black', lw=0.7)
     sns.distplot(obs_res, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax2)
 
-    ax3.plot(times[1:], stat_res[1:], color='black', lw=0.7)
-    ax3.plot(times[1:], np.zeros(len(stat_res) - 1), color='black', lw=0.7)
+    ax3.plot(times, stat_res, color='black', lw=0.7)
+    ax3.plot(times, np.zeros(len(stat_res)), color='black', lw=0.7)
     sns.distplot(stat_res, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax4)
