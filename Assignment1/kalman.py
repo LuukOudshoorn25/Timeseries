@@ -94,18 +94,18 @@ class KFclass():
         r = np.zeros(len(self.y))
         N = np.zeros(len(self.y))
         V = np.zeros(len(self.y))
-        
-        for t in np.arange(len(self.y)-1,0,-1):
+
+        for t in np.arange(len(self.y)-1,-1,-1):
             r[t-1] = v[t]/F[t]+L[t]*r[t]
         for t in np.arange(len(self.y)-1,0,-1):
             N[t-1] = 1/F[t] + L[t]**2*N[t]
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
-        
+        print(V[0])
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]
-        for t in range(1,len(self.y)):
+        for t in range(0,len(self.y)):
             alphas[t] = a[t] + P[t]*r[t-1]
         alphas[-1]=np.nan
         std = np.sqrt(V)[1:]
@@ -157,12 +157,11 @@ class KFclass():
             a[0] = self.y[0]
         # Iterate 
         for t in range(0,len(self.y)-1):
-            F[t] = P[t]+sigma_eps2
+            v[t] = np.nan_to_num(self.y[t]-a[t])
+            F[t] = P[t]+sigma_eps2 if np.isfinite(self.y[t]) else np.inf
             # K is defined as ratio of P and F
             Kt = P[t]/F[t] if np.isfinite(self.y[t]) else 0
-            v[t] = np.nan_to_num(self.y[t]-a[t])
             a[t+1] = a[t] + Kt*v[t]
-            F[t] = P[t]+sigma_eps2
             P[t+1] = P[t]*(1-Kt)+sigma_eta2
         v[-1] = self.y[-1]-a[-1]
         F[-1] = P[-1]+sigma_eps2
@@ -183,7 +182,7 @@ class KFclass():
             N[t-1] = 1/F[t] + L[t]**2*N[t]
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
-        
+        print(F[index_missing], F)
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]

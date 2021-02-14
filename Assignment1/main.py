@@ -88,11 +88,11 @@ def nile_data():
     # Plot basic Kalman filtering (fig1)
     # KFobj.iterate()
     # Plot state smoothing  (fig2)
-    # KFobj.state_smooth()
+    KFobj.state_smooth()
     # Plot disturbance smoothing (fig3)
-    KFobj.disturbance_smoothing()
+    # KFobj.disturbance_smoothing()
     # Now with missing values (fig5)
-    # KFobj.missing_data()
+    KFobj.missing_data()
     # Now predictions using Kalman filter
     # Extend df with missing observations
     df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'dep_var':np.ones(30)*np.nan}).set_index('year')

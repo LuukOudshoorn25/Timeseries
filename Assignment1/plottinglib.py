@@ -50,20 +50,20 @@ def plot_fig2_1(times, y, a, std, P, v, F,fname, var_name='Volume of Nile'):
 
 def plot_fig2_2(times, y, alphas, std, V, r, N, fname, var_name='Volume of Nile'):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
-    ax1.plot(times[1:], alphas[1:],color='black',lw=1)
+    ax1.plot(times, alphas,color='black',lw=1)
     ax1.scatter(times, y, s=1,color='black')
     ax1.plot(times[1:], alphas[1:]+1.645*std,color='grey',lw=0.7)
     ax1.plot(times[1:], alphas[1:]-1.645*std,color='grey',lw=0.7)
     ax1.set_ylabel(var_name)
 
-    ax2.plot(times[1:-1], V[1:-1],color='black',lw=1)
+    ax2.plot(times, V,color='black',lw=1)
     ax2.set_ylabel('Smoothed state variance')
 
-    ax3.plot(times[1:], r[1:],color='black',lw=1)
+    ax3.plot(times, r,color='black',lw=1)
     ax3.set_ylabel('Smoothing cumulant')
     ax3.axhline(0,ls='--',lw=0.5,color='black')
     
-    ax4.plot(times[:-1], N[:-1],color='black',lw=1)
+    ax4.plot(times, N,color='black',lw=1)
     ax4.set_ylabel('Smoothing variance cumulant')
     
     ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
