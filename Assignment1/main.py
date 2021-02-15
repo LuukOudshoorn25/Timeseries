@@ -102,14 +102,14 @@ def nile_data():
     # KFpred.iterate()
     # Fig 7
     KFobj = KFclass(df, init_pars=parameters, var='dep_var')
-    # KFobj.diag_predict()
+    KFobj.diag_predict()
     # Fig 8
-    KFobj.diag_residuals()
+    #KFobj.diag_residuals()
 
 
 def main():
     nile_data()
-    # bilt_data()
+    bilt_data()
 
 if __name__ == "__main__":
     main()
