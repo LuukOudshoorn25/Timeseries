@@ -101,7 +101,8 @@ class KFclass():
             N[t-1] = 1/F[t] + L[t]**2*N[t]
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
-
+        V[0] = V[-1]
+        
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
         alphas[0] = a[t]

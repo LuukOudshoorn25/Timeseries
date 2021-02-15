@@ -88,7 +88,7 @@ def nile_data():
     # Plot basic Kalman filtering (fig1)
     # KFobj.iterate()
     # Plot state smoothing  (fig2)
-    # KFobj.state_smooth()
+    KFobj.state_smooth()
     # Plot disturbance smoothing (fig3)
     # KFobj.disturbance_smoothing()
     # Now with missing values (fig5)
@@ -101,15 +101,15 @@ def nile_data():
     # KFpred = KFpredictor(df_extended, init_pars=parameters, var='dep_var')
     # KFpred.iterate()
     # Fig 7
-    KFobj = KFclass(df, init_pars=parameters, var='dep_var')
-    KFobj.diag_predict()
+    #KFobj = KFclass(df, init_pars=parameters, var='dep_var')
+    #KFobj.diag_predict()
     # Fig 8
     #KFobj.diag_residuals()
 
 
 def main():
     nile_data()
-    bilt_data()
+    #bilt_data()
 
 if __name__ == "__main__":
     main()
