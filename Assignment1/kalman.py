@@ -102,6 +102,7 @@ class KFclass():
         for t in np.arange(len(self.y)-1,0,-1):
             V[t] = P[t] - P[t]**2*N[t-1]
         V[0] = V[-1]
+        N[0] = N[-2]
         
         # Do the recursion for alpha
         alphas = np.zeros(len(self.y))
