@@ -89,7 +89,7 @@ def nile_data():
     # KFobj.fit_model()
 
     # Plot basic Kalman filtering (fig1)
-    # KFobj.iterate()
+    KFobj.iterate()
     # Plot state smoothing  (fig2)
     # KFobj.state_smooth()
     # Plot disturbance smoothing (fig3)
