@@ -107,7 +107,7 @@ def nile_data():
     KFobj.diag_residuals()
 
 def main():
-    # nile_data()
+    nile_data()
     bilt_data()
 
 if __name__ == "__main__":

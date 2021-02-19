@@ -41,5 +41,5 @@ class KFpredictor():
         
         if plot:
             fig_name = self.var_name + 'Fig26.pdf'
-            plot_fig2_1(self.times, self.y,a, std, P, a, F,fig_name, self.var_name)
+            plot_fig2_6(self.times, self.y, std, P, a, F,fig_name, self.var_name)
         return a, std, P, v, F

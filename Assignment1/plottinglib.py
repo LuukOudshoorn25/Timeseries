@@ -123,6 +123,30 @@ def plot_fig2_5(times, y,a,P,alphas,V, fname, var_name='Volume of Nile'):
     plt.show()
 
 
+def plot_fig2_6(times, y, std, P, a, F, fname, var_name='Volume of Nile'):
+    fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, sharex=True, figsize=(5, 3.5))
+    ax1.plot(times[1:], a[1:], color='black', lw=1)
+    ax1.scatter(times[1:], y[1:], s=1, color='black')
+    ax1.plot(times[1:], a[1:] + 1.645 * std[1:], color='grey', lw=0.7)
+    ax1.plot(times[1:], a[1:] - 1.645 * std[1:], color='grey', lw=0.7)
+    ax1.set_ylabel('Forecast')
+
+    ax2.plot(times[1:], P[1:], color='black', lw=1)
+    ax2.set_ylabel('State variance')
+
+    ax3.plot(times[1:], a[1:], color='black', lw=1)
+    ax3.set_ylabel('Observation forecast')
+
+    ax4.plot(times[1:], F[1:], color='black', lw=1)
+    ax4.set_ylabel('Observation forecast variance')
+
+    ax1, ax2, ax3, ax4 = make_titles([ax1, ax2, ax3, ax4])
+
+    plt.tight_layout()
+    plt.savefig(fname, bbox_inches='tight')
+    plt.show()
+
+
 def plot_fig2_7(times, eps, fname):
     import statsmodels.api as sm
 
