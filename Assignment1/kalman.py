@@ -21,8 +21,9 @@ class KFclass():
         n = len(self.y)
         _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
         print(np.log(P/par_ini[0]))
-        L = -(n/2)*np.log(2*np.pi) - 0.5*np.sum((np.log(F[2:]) + (v[2:]**2/F[2:]))) \
-            + (n/2)*np.sum(np.log(2*P[2:])) + (n-1)/2
+        L = -(n/2)*np.log(2*np.pi) - 0.5*np.sum((np.log(F[1:]) + (v[1:]**2/F[1:]))) \
+            #
+        + 0.5*np.log(P[1])#+ (n/2)*np.sum(np.log(2*P[1]/(par_ini[0]+par_ini[1]))) + (n-1)/2
         llik = L#np.mean(L)
         return 1*llik
 
@@ -57,7 +58,7 @@ class KFclass():
         v = np.zeros(len(self.y))
         P = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
-        P[0] = self.pardict['P1']
+        P[0] = self.pardict['P1']*self.pardict['sigma_eps2']
         if estimate == True:
             sigma_eps2 = init_params[0]
             sigma_eta2 = init_params[1]
