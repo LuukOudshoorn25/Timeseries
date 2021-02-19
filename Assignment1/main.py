@@ -85,32 +85,30 @@ def nile_data():
                 'sigma_eta2':1469.1}
     # Create Kalman filter object
     KFobj = KFclass(df, init_pars=parameters, var='dep_var')
-    print(KFobj.__llik_fun__(par_ini=[15099, 1469.1]))
-    # KFobj.fit_model()
-
     # Plot basic Kalman filtering (fig1)
     KFobj.iterate()
     # Plot state smoothing  (fig2)
-    # KFobj.state_smooth()
+    KFobj.state_smooth()
     # Plot disturbance smoothing (fig3)
-    # KFobj.disturbance_smoothing()
+    KFobj.disturbance_smoothing()
     # Now with missing values (fig5)
-    # KFobj.missing_data()
+    KFobj.missing_data()
     # Now predictions using Kalman filter
     # Extend df with missing observations
-    # df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'dep_var':np.ones(30)*np.nan}).set_index('year')
-    # df_extended = pd.concat((df, df_ext))
+    df_ext = pd.DataFrame({'year':np.arange(1971,2001), 'dep_var':np.ones(30)*np.nan}).set_index('year')
+    df_extended = pd.concat((df, df_ext))
     # fig 6
-    # KFpred = KFpredictor(df_extended, init_pars=parameters, var='dep_var')
-    # KFpred.iterate()
+    KFpred = KFpredictor(df_extended, init_pars=parameters, var='dep_var')
+    KFpred.iterate()
     # Fig 7
-    #KFobj = KFclass(df, init_pars=parameters, var='dep_var')
-    #KFobj.diag_predict()
+    KFobj = KFclass(df, init_pars=parameters, var='dep_var')
+    KFobj.diag_predict()
     # Fig 8
-    # KFobj.diag_residuals()
+    KFobj.diag_residuals()
 
 def main():
-    nile_data()
+    # nile_data()
+    bilt_data()
 
 if __name__ == "__main__":
     main()

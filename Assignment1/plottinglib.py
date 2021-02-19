@@ -135,11 +135,7 @@ def plot_fig2_7(times, eps, fname):
     
     sm.qqplot(eps, line ='45', ax=ax3,ms=1,lw=0.1)
     ax3.set_ylabel('')
-    acf_,conf = acf(eps,nlags=10,alpha=0.05)
-    print(acf_)
-    #ax4.bar(np.arange(len(acf_))[1:],acf_[1:],color='grey')
-    #ax4.plot(np.arange(len(acf_))[1:], conf[1:],ls='dotted',color='black',lw=0.8)
-    sm.graphics.tsa.plot_acf(eps, lags=10, ax=ax4, color='black',ms=1)
+    sm.graphics.tsa.plot_acf(eps, lags=10, ax=ax4, color='black')
     ax4.axhline(0,ls='--',color='black',lw=0.5)
     ax4.set_ylim(-1,1)
     ax4.set_title('')
