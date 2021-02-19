@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy import stats
 import statsmodels.api as sm 
 from statsmodels.tsa.stattools import acf
 
@@ -176,12 +177,15 @@ def plot_fig2_8(times, obs_res, stat_res, fname):
     fig, [[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(5, 3.5))
     ax1.plot(times, obs_res, color='black', lw=0.7)
     ax1.plot(times, np.zeros(len(obs_res)), color='black', lw=0.7)
+    print(stats.jarque_bera(obs_res), stats.jarque_bera(stat_res[~np.isnan(stat_res)]))
+
     sns.distplot(obs_res, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax2)
 
     ax3.plot(times, stat_res, color='black', lw=0.7)
     ax3.plot(times, np.zeros(len(stat_res)), color='black', lw=0.7)
+
     sns.distplot(stat_res, hist=True, bins=13, kde=True, color='darkblue',
                  hist_kws={'edgecolor': 'black'},
                  kde_kws={'linewidth': 0.7}, ax=ax4)
