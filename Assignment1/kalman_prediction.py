@@ -21,12 +21,12 @@ class KFpredictor():
         v = np.zeros(len(self.y))
         P = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
-        P[1] = self.pardict['P1']
-        a[1] = self.y[0]
+        P[0] = self.pardict['P1']
+        a[0] = self.y[0]
         sigma_eps2 = self.pardict['sigma_eps2']
         sigma_eta2 = self.pardict['sigma_eta2']
         # Iterate 
-        for t in range(1,len(self.y)-1):
+        for t in range(0,len(self.y)-1):
             F[t] = P[t]+sigma_eps2
             # K is defined as ratio of P and F
             Kt = P[t]/F[t] if np.isfinite(self.y[t]) else 0
