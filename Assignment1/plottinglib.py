@@ -56,14 +56,14 @@ def plot_fig2_2(times, y, alphas, std, V, r, N, fname, var_name='Volume of Nile'
     ax1.plot(times[1:], alphas[1:]-1.645*std,color='grey',lw=0.7)
     ax1.set_ylabel(var_name)
 
-    ax2.plot(times, V,color='black',lw=1)
+    ax2.plot(times[1:], V[1:],color='black',lw=1)
     ax2.set_ylabel('Smoothed state variance')
 
-    ax3.plot(times, r,color='black',lw=1)
+    ax3.plot(times[1:], r[1:],color='black',lw=1)
     ax3.set_ylabel('Smoothing cumulant')
     ax3.axhline(0,ls='--',lw=0.5,color='black')
     
-    ax4.plot(times, N,color='black',lw=1)
+    ax4.plot(times[1:], N[1:],color='black',lw=1)
     ax4.set_ylabel('Smoothing variance cumulant')
     #ax4.set_ylim(4.2e-5,1.2e-4)
 
@@ -75,21 +75,21 @@ def plot_fig2_2(times, y, alphas, std, V, r, N, fname, var_name='Volume of Nile'
 
 def plot_fig2_3(times, eps_hat, var_eps, eta_hat,var_eta,fname):
     fig, [[ax1,ax2],[ax3,ax4]] = plt.subplots(2,2, sharex=True,figsize=(5,3.5))
-    ax1.plot(times, eps_hat,color='black',lw=1)
+    ax1.plot(times[1:], eps_hat[1:],color='black',lw=1)
     ax1.set_ylabel('Observation error')
     ax1.axhline(0,ls='--',lw=0.5,color='black')
 
 
-    ax2.plot(times, np.sqrt(var_eps),color='black',lw=1)
+    ax2.plot(times[1:], np.sqrt(var_eps[1:]),color='black',lw=1)
     ax2.set_ylabel('Observation error variance')
     
 
-    ax3.plot(times, eta_hat,color='black',lw=1)
+    ax3.plot(times[1:], eta_hat[1:],color='black',lw=1)
     ax3.set_ylabel('State error')
     ax3.axhline(0,ls='--',lw=0.5,color='black')
     
 
-    ax4.plot(times, np.sqrt(var_eta),color='black',lw=1)
+    ax4.plot(times[1:], np.sqrt(var_eta[1:]),color='black',lw=1)
     ax4.set_ylabel('State error variance')
 
     ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
