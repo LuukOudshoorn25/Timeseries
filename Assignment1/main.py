@@ -17,7 +17,7 @@ def bilt_data():
     plt.style.use('MNRAS_stylesheet')
 
     # Load Data
-    df = pd.read_excel('temperatures_Bilt.xlsx', header=0)
+    df = pd.read_csv('temperatures_Bilt.csv', header=0)
     df = df.rename(columns={' TG_hom': 'dep_var', 'YYYYMMDD': 'times'})
     df.index = pd.to_datetime(df.times)
     # Aggregate to 1 year and drop 2021
