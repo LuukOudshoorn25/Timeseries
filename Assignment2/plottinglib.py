@@ -19,3 +19,10 @@ def plot_raw_data(df):
     plt.tight_layout()
     # plt.xlabel('Year')
     plt.show()
+
+
+def QMLplot(df):
+    fig, ax = plt.subplots()
+    ax.hist(df.transformed_returns)
+    plt.tight_layout()
+    plt.show()

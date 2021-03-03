@@ -22,24 +22,30 @@ class KFclass():
         # likelihood function of state space model
         n = len(self.y)
         _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
-        L = -(n/2)*np.log(2*np.pi) - 0.5*np.sum((np.log(F[1:]) + (v[1:]**2/F[1:]))) \
-            + (n/2)*np.log(2*np.pi) + (n-1)/2
-        return (-1)*L
+        #L = -(n/2)*np.log(2*np.pi) - 0.5*np.sum((np.log(F[1:]) + (v[1:]**2/F[1:]))) \
+        #    + (n/2)*np.log(2*np.pi) + (n-1)/2
+        L = -0.5*np.log(np.pi*2) - 0.5*np.log(F) - 0.5*(v+1.27)**2/(2*F)
+        return (-1)*np.sum(L)
 
     def fit_model(self):
         # Initialize at the initial values parsed to the class
-        sigma_eps2 = self.pardict['sigma_eps2']
+        phi = self.pardict['phi']
+        omega = self.pardict['omega']
         sigma_eta2 = self.pardict['sigma_eta2']
 
-        par_ini = [sigma_eps2, sigma_eta2]
+        par_ini = [phi, omega, sigma_eta2]
         # minimize the likelihood function
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
         est = minimize(self.__llik_fun__, x0=par_ini,
                        options = self.options,
-                       method='SLSQP', bounds=((0,100000),(0,100000)), jac=Lprime)
-        self.pardict['sigma_eps2'] = est.x[0]
-        self.pardict['sigma_eta2'] = est.x[1]
-        print(est)
+                       method='SLSQP', bounds=((0,1), (-100,100),(0,10000)))#, jac=Lprime)
+        self.pardict['phi'] = est.x[0]
+        self.pardict['omega'] = est.x[1]
+        self.pardict['sigma_eta2'] = est.x[2]
+        
+        print('omega',est.x[1])
+        print('phi',est.x[0])
+        print('sigma_eta',np.sqrt(est.x[2]))
 
     def reset_data(self):
         self.y = self.df[self.var].values.flatten()
@@ -57,23 +63,26 @@ class KFclass():
         v = np.zeros(len(self.y))
         P = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
-        P[0] = self.pardict['P1']
-        a[0] = self.y[0]
+        sigma_eps2 = np.pi**2/2
         if estimate == True:
-            sigma_eps2 = init_params[0]
-            sigma_eta2 = init_params[1]
+            phi = init_params[0]
+            omega = init_params[1]
+            sigma_eta2 = init_params[2]
         else:
-            sigma_eps2 = self.pardict['sigma_eps2']
+            phi = self.pardict['phi']
+            omega = self.pardict['omega']
             sigma_eta2 = self.pardict['sigma_eta2']
+        P[0] = sigma_eta2/(1-phi**2)
+        a[0] = omega
         # Iterate
         for t in range(0, len(self.y) - 1):
+            v[t] = self.y[t] - a[t]
             F[t] = P[t] + sigma_eps2
             # K is defined as ratio of P and F
-            Kt = P[t] / F[t]
-            v[t] = self.y[t] - a[t]
-            a[t + 1] = a[t] + Kt * v[t]
-            P[t + 1] = P[t] * (1 - Kt) + sigma_eta2
-        F[-1] = P[-1] + sigma_eps2
+            Kt = phi * P[t] / F[t]
+            a[t + 1] = omega + phi*a[t] + Kt * v[t]
+            P[t + 1] = phi**2*P[t] + sigma_eta2 - Kt**2*F[t]
+        F[-1] = P[-1] +  sigma_eps2
         v[-1] = self.y[-1] - a[-1]
 
         # Obtain std error of prediction form variance
