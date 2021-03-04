@@ -22,10 +22,10 @@ class KFclass():
         # likelihood function of state space model
         n = len(self.y)
         _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
-        #L = -(n/2)*np.log(2*np.pi) - 0.5*np.sum((np.log(F[1:]) + (v[1:]**2/F[1:]))) \
-        #    + (n/2)*np.log(2*np.pi) + (n-1)/2
-        L = -0.5*np.log(np.pi*2) - 0.5*np.log(F) - 0.5*(v+1.27)**2/(2*F)
-        return (-1)*np.sum(L)
+        l = (n-1)/2 - 0.5 * np.sum(np.log(np.abs(F[1:]))) - 0.5 * np.sum((v[1:]**2) / F[1:])
+
+        llik = -np.sum(l)
+        return llik
 
     def fit_model(self):
         # Initialize at the initial values parsed to the class
@@ -64,6 +64,7 @@ class KFclass():
         P = np.zeros(len(self.y))
         # Initialize at the initial values parsed to the class
         sigma_eps2 = np.pi**2/2
+        c = -1.27
         if estimate == True:
             phi = init_params[0]
             omega = init_params[1]
@@ -72,11 +73,11 @@ class KFclass():
             phi = self.pardict['phi']
             omega = self.pardict['omega']
             sigma_eta2 = self.pardict['sigma_eta2']
-        P[0] = sigma_eta2/(1-phi**2)
-        a[0] = omega
+        P[0] = sigma_eta2 / (1-phi**2)
+        a[0] = -10
         # Iterate
         for t in range(0, len(self.y) - 1):
-            v[t] = self.y[t] - a[t]
+            v[t] = self.y[t] - a[t] - c
             F[t] = P[t] + sigma_eps2
             # K is defined as ratio of P and F
             Kt = phi * P[t] / F[t]
@@ -96,14 +97,15 @@ class KFclass():
     def state_smooth(self, plot=True):
         a, std, P, v, F = self.iterate(plot=False)
         # Obtain all time values for L
-        L = self.pardict['sigma_eps2'] / F
+        L = self.pardict['phi'] -P/F
+        
         # Do the recursion for r
         r = np.zeros(len(self.y))
         N = np.zeros(len(self.y))
         V = np.zeros(len(self.y))
 
         for t in np.arange(len(self.y) - 1, -1, -1):
-            r[t - 1] = v[t] / F[t] + L[t] * r[t]
+            r[t - 1] = self.pardict['phi']*v[t] / F[t] + L[t] * r[t]
         for t in np.arange(len(self.y) - 1, 0, -1):
             N[t - 1] = 1 / F[t] + L[t] ** 2 * N[t]
         for t in np.arange(len(self.y) - 1, 0, -1):
