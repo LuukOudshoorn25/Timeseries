@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 # Import our own libs with functions
 from plottinglib import *
-from kalman import KFclass
+from kalman import *
 from kalman_prediction import *
 
 def DK_book():
@@ -20,25 +20,11 @@ def DK_book():
     df = pd.read_table('sv.dat')
     df.columns = ['returns'] # dollar exchange rate
     df['returns'] = df['returns'] / 100
-    
+    print_stats(df['returns'])
     x_t = np.log((df['returns']-np.mean(df['returns']))**2)
     df['transformed_returns'] = x_t
 
-    #df.x = df.x-df.x.mean()
-    #df['y'] = np.log(1+df['x']/100)
-    
-
-    #plt.figure(figsize=(8,3))
-    #plt.plot(df.index, df.y, lw=0.3)
-    #plt.ylim(-0.035, 0.05)
-    #plt.show()
-
-    #    df['transformed_returns'] = np.log(df['y']**2)
-    
-    #-np.mean(df.returns)
-    #print(df.transformed_returns)
-    # plot raw data
-    #plot_raw_data(df)
+    plot_raw_data(df)
 
     # Perform QML-method
     #QMLplot(df)
@@ -53,10 +39,14 @@ def DK_book():
                      'omega': -0.08,
                      'sigma_eta2':0.083**2}
     KFobj.fit_model()
+    KFobj.state_smooth(plot=True)
     #print(KFobj.iterate(plot=False)[0])
-    plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
-    plt.scatter(df.index, df['transformed_returns'], s=1)
-    plt.show()
+    #plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
+    #plt.scatter(df.index, df['transformed_returns'], s=1)
+    #plt.show()
+    #plt.plot(100*np.pi/np.sqrt(2)*np.exp(0.5*KFobj.state_smooth(plot=False)[0]))
+    #plt.plot(1e2*np.exp(0.5*KFobj.state_smooth(plot=False)[0]),color='black',lw=1)
+    #plt.show()
     #print(alphas)
     
 """

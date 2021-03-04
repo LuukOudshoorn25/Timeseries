@@ -1,7 +1,7 @@
 from scipy.optimize import minimize, approx_fprime
 from plottinglib import *
 from scipy.optimize import minimize, approx_fprime
-
+from scipy.stats import kurtosis, skew
 from plottinglib import *
 
 
@@ -121,8 +121,8 @@ class KFclass():
         alphas[-1] = np.nan
         std = np.sqrt(V)[1:]
         if plot:
-            fig_name = self.var_name + 'Fig22.pdf'
-            plot_fig2_2(self.times, self.y, alphas, std, V, r, N, fname=fig_name, var_name=self.var_name)
+            fig_name = self.var_name + 'Fig1.pdf'
+            plot_smoothed(self.times, self.y, alphas, fig_name)
         return alphas, N
 
     def disturbance_smoothing(self):
@@ -241,3 +241,11 @@ class KFclass():
         if plot:
             fig_name = self.var_name + 'Fig28.pdf'
             plot_fig2_8(self.times, obs_res, stat_res, fname=fig_name)
+
+
+def print_stats(x):
+    print('Mean ',np.mean(x))
+    print('Variance ',np.var(x))
+    print('Median ',np.median(x))
+    print('Kurtosis ',kurtosis(x))
+    print('Skewness ',skew(x))
