@@ -77,65 +77,6 @@ KFobj.disturbance_smoothing()
 KFobj.missing_data()
 """
 
-def SP500():
-    # Set matplotlib style for fancy plotting
-    plt.style.use('MNRAS_stylesheet')
-
-    # Load the data
-    df = pd.read_csv('oxfordmanrealizedvolatilityindices.csv', index_col=0)
-    df = df[df['Symbol'] == '.SPX']
-    df['returns'] = (df['close_price'] - df['close_price'].shift(1))/100
-    df['logreturns'] = np.log(df['close_price']) - np.log(df['close_price'].shift(1))
-    df['transformed_returns'] = np.log((df['logreturns'] - np.mean(df['logreturns'])) ** 2)
-    df.index = np.arange(0, len(df), 1)
-
-    init_parameters = {'phi': 0.99,
-                       'omega': -0.08,
-                       'sigma_eta2':0.083**2}
-    KFobj = KFclass(df, init_parameters,'transformed_returns', var_name='Transformed returns')
-    KFobj.init_state_matrices()
-    print(-KFobj.__llik_fun__([0.1, -0.0878, 0.0837**2]))
-
-    KFobj.pardict = {'phi': 0.1,
-                     'omega': -0.08,
-                     'sigma_eta2':0.083**2}
-
-    # KFobj.fit_model()
-    # print(KFobj.iterate(plot=False)[0])
-    plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
-    plt.scatter(df.index, df['transformed_returns'], s=1)
-    plt.show()
-
-
-def nile_data():
-    # Import required libs
-
-    # Set matplotlib style for fancy plotting
-    plt.style.use('MNRAS_stylesheet')
-
-    # Load the data
-    df = pd.read_table('Nile.dat')
-    df.columns = ['volume']
-    df['year'] = np.arange(1871, 1971, 1)
-    df = df.set_index('year')
-    df = pd.DataFrame(df)
-    df = df.rename(columns={'volume': 'dep_var'})
-
-    # Define the system matrices
-    Z = np.array(1)
-    R = np.array(1)
-    T = np.array(1)
-    d = 0
-    c = 0
-    H = np.array(15099)
-    Q = np.array(1469.1)
-
-    # Run Kalman filter and reproduce fig 2.1
-    # Create Kalman filter object
-    KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='dep_var')
-    KFobj.init_filter(a=df['dep_var'].iloc[0], P=1e7)
-    KFobj.state_smooth(plot=True)
-
 def DK_book_new():
     # Set matplotlib style for fancy plotting
     plt.style.use('MNRAS_stylesheet')
@@ -157,21 +98,50 @@ def DK_book_new():
     T = np.array(0.99)  # to be estimated
     d = np.array(-1.27)
     c = np.array(-0.08) # to be estimated
-    H = np.array(np.sqrt(np.pi**2/2))
+    H = np.array(np.pi**2/2)
     Q = np.array(1)
 
-    # init_parameters = {'T': 0.99,
-    #                    'omega': -0.08,
-    #                    'sigma_eta2':0.083**2}
     # Run Kalman filter and reproduce fig 2.1
     # Create Kalman filter object
     KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns')
-    KFobj.init_filter(a=-10, P=R / (1-T**2))
-    # KFobj.fit_model()
+
+    KFobj.init_filter(a=-10, P=R/(1-T**2))
+    KFobj.fit_model()
     # KFobj.state_smooth(plot=True)
     plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
     plt.scatter(df.index, df['transformed_returns'], s=1)
     plt.show()
+
+def SP500():
+    # Set matplotlib style for fancy plotting
+    plt.style.use('MNRAS_stylesheet')
+
+    # Load the data
+    df = pd.read_csv('oxfordmanrealizedvolatilityindices.csv', index_col=0)
+    df = df[df['Symbol'] == '.SPX']
+    df['returns'] = (df['close_price'] - df['close_price'].shift(1))/100
+    df['logreturns'] = np.log(df['close_price']) - np.log(df['close_price'].shift(1))
+    df = df.iloc[1:]
+    df['transformed_returns'] = np.log((df['logreturns'] - np.mean(df['logreturns'])) ** 2)
+    df.index = np.arange(0, len(df), 1)
+    print(df)
+    # Define the system matrices
+    Z = np.array(1)
+    R = np.array(np.sqrt(0.083**2))  # to be estimated
+    T = np.array(0.99)  # to be estimated
+    d = np.array(-1.27)
+    c = np.array(-0.08) # to be estimated
+    H = np.array(np.pi**2/2)
+    Q = np.array(1)
+    # Run Kalman filter and reproduce fig 2.1
+    # Create Kalman filter object
+    KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns')
+    KFobj.init_filter(a=-10.89, P=R/(1-T**2))
+    KFobj.fit_model()
+    KFobj.iterate()
+    # plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
+    # plt.scatter(df.index, df['transformed_returns'], s=1)
+    # plt.show()
 
 def main():
     DK_book_new()

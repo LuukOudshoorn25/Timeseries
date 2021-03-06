@@ -6,7 +6,7 @@ from plottinglib import *
 
 
 class KFnew():
-    def __init__(self, df, Z, Q, H, T, R, d, c, var='dep_var'):
+    def __init__(self, df, Z, Q, H, T, R, d, c, var='dep_var', secondvar=None):
         """Initialisation, where df is a pandas DataFrame and var is the name of the column to study and
            init_pars is a dictionary with initial values"""
         self.Z = Z
@@ -32,29 +32,31 @@ class KFnew():
         # likelihood function of state space model
         n = len(self.y)
         _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
-        l = (n - 1) / 2 - 0.5 * np.sum(np.log(np.abs(F[1:]))) - 0.5 * np.sum((v[1:] ** 2) / F[1:])
-
-        llik = -np.sum(l)
-        return llik
+        L= (n - 1) / 2 - 0.5 * np.sum(np.log(F[1:])) - 0.5 * np.sum((v[1:] ** 2) / F[1:]) #+ np.log(self.P_start)
+        return (-1)*L
 
     def fit_model(self):
         # Initialize at the initial values parsed to the class
         phi = self.T
         omega = self.c
         sigma_eta2 = self.R
-
+        # sigma_eta2 = self.Q
+        # sigma_eps2 = self.H
         par_ini = [phi, omega, sigma_eta2]
+        # par_ini = [sigma_eps2, sigma_eta2]
         # minimize the likelihood function
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
         est = minimize(self.__llik_fun__, x0=par_ini,
                        options=self.options,
-                       method='SLSQP', bounds=((0, 1), (-100, 100), (0, 10000)))  # , jac=Lprime)
+                       method='Newton-CG', bounds=((-1, 1), (-100, 100), (0, 10000)), jac=Lprime)
         self.T = est.x[0]
         self.c = est.x[1]
         self.R = est.x[2]
+        # self.Q = est.x[1]
+        # self.H = est.x[0]
         print('omega', est.x[1])
-        print('phi', est.x[0])
-        print('sigma_eta', np.sqrt(est.x[2]))
+        print('sigma_eps', est.x[0])
+        print('sigma_eta', est.x[1])
 
     def iterate(self, plot=True, estimate=False, init_params=None):
         """Iterate over the observations and update the filtered values after each iteration"""
@@ -68,6 +70,8 @@ class KFnew():
             self.T = np.array(init_params[0])
             self.c = np.array(init_params[1])
             self.R = np.array(init_params[2])
+            # self.H = np.array(init_params[0])
+            # self.Q = np.array(init_params[1])
         P[0] = self.P_start
         a[0] = self.a_start
         # Iterate
@@ -80,10 +84,8 @@ class KFnew():
             P[t + 1] = self.T * P_t * self.T.transpose() + self.R * self.Q * self.R.transpose()
         F[-1] = P[-1] + self.H
         v[-1] = self.y[-1] - a[-1]
-
         # Obtain std error of prediction form variance
         std = np.sqrt((P * self.H) / (P + self.H))
-
         if plot:
             plot_fig2_1(self.times, self.y, a, std, P, v, F)
         return a, std, P, v, F
@@ -114,6 +116,7 @@ class KFnew():
             alphas[t] = a[t] + P[t] * r[t - 1]
         alphas[-1] = np.nan
         std = np.sqrt(V)[1:]
+        # print(self.y[0])
         if plot:
             plot_fig2_2(self.times, self.y, alphas, std, V, r, N)
         return alphas, N
