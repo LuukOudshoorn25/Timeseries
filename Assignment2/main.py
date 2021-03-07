@@ -112,6 +112,8 @@ def DK_book_new():
     plt.scatter(df.index, df['transformed_returns'], s=1)
     plt.show()
 
+
+
 def SP500():
     # Set matplotlib style for fancy plotting
     plt.style.use('MNRAS_stylesheet')
@@ -142,6 +144,14 @@ def SP500():
     # plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
     # plt.scatter(df.index, df['transformed_returns'], s=1)
     # plt.show()
+
+    Z = np.vstack((np.ones(len(df)), np.log(df['rk_parzen'].values)))
+    KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns', method='iterateRegression')
+    KFobj.init_filter(a=-10.89, P=R/(1-T**2), b=0.1)
+    KFobj.fit_model()
+    KFobj.iterateRegression()
+
+
 
 def main():
     DK_book_new()
