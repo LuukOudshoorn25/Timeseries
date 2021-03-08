@@ -79,9 +79,14 @@ def kalmanFilter(x_t, theta):
     for t in range(1, N):
         v_t[t] = x_t.iloc[t - 1] - a_t[t] - c  # fixed mean adjustment
         F_t[t] = P_t[t] + sig_eps
+
+
         k_t[t] = (phi * P_t[t]) / F_t[t]
         a_t[t + 1] = omega + phi * a_t[t] + k_t[t] * v_t[t]  # omega is the mean adjustment to be estimated
+        print(v_t[t], F_t[t], P_t[t], a_t[t])
+        # print(a_t[t])
         P_t[t + 1] = phi ** 2 * P_t[t] + sig_eta - (k_t[t] ** 2) * F_t[t]
+        # print(phi ** 2 * P_t[1] + sig_eta - (k_t[1] ** 2) * F_t[1], sig_eta)
     return [a_t, P_t, v_t, F_t]
 
 def estimation(x_t):
@@ -94,7 +99,7 @@ def estimation(x_t):
                        sig_ini
                       ])
     options ={'eps':1e-09,  # argument convergence criteria
-              'disp': True,  # display iterations
+              'disp': False,  # display iterations
               'maxiter':200} # maximum number of iterations
     
     results = scipy.optimize.minimize(likelihood, theta_ini, args=(x_t),
@@ -139,7 +144,6 @@ def likelihood(theta, x_t):
     l = (N - 1)/2 - 0.5 * np.sum(np.log(np.abs(F_t[2:]))) - 0.5 * np.sum((v_t[2:]**2) / F_t[2:])
 
     llik = -np.mean(l)
-
     return llik
 
 def basicDescriptives(data):
@@ -195,12 +199,12 @@ def main():
     r_t = data      #y_t: Daily logreturns of pound-dollar exchange rates, mean corrected
     y_t = r_t/100                       #tranformation by dividing by 100
     #plot_a(y_t)
-    
-    print("Mean:",basicDescriptives(y_t)[0])
-    print("Median:",basicDescriptives(y_t)[1])
-    print("Std:",basicDescriptives(y_t)[2])
-    print("Skewness:",basicDescriptives(y_t)[3])
-    print("Kurtosis:",basicDescriptives(y_t)[4])
+    #
+    # print("Mean:",basicDescriptives(y_t)[0])
+    # print("Median:",basicDescriptives(y_t)[1])
+    # print("Std:",basicDescriptives(y_t)[2])
+    # print("Skewness:",basicDescriptives(y_t)[3])
+    # print("Kurtosis:",basicDescriptives(y_t)[4])
     
     #for i in range(5):
     #    print(basicDescriptives(y_t)[i]) #mean,median,std,skewness,kurtosis
@@ -211,14 +215,13 @@ def main():
     x_t = np.log((y_t - np.mean(y_t))**2)
     # plot_b(x_t)
     
-    
     ###Question c###
-    omega = estimation(x_t)[0]
-    print("omega:",omega)
-    phi = estimation(x_t)[1]
-    print("phi:",phi)
-    sig_eta = estimation(x_t)[2]
-    print("sig_eta:",sig_eta)
+    # omega = estimation(x_t)[0]
+    # print("omega:",omega)
+    # phi = estimation(x_t)[1]
+    # print("phi:",phi)
+    # sig_eta = estimation(x_t)[2]
+    # print("sig_eta:",sig_eta)
 
     omega = -0.015  # estimated value for intercept from book
     phi = 0.995  # estimated value for ar coefficient from book
@@ -232,28 +235,27 @@ def main():
     
     #define vectors for AR(1)+noise model
     a_t = kalmanFilter(x_t,theta)[0]  # Filtered state a_t
-    P_t = kalmanFilter(x_t,theta)[1]  # Filtered state variance p_t,
-    v_t = kalmanFilter(x_t,theta)[2]  # Prediction errors v_t
-    F_t = kalmanFilter(x_t,theta)[3]  # Prediction variance F_t
-
-    alpha_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[0]
-    V_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[1]
-    r_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[2]
-    N_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[3]
-    
-    #simulated y's and alpha's
-    y_plus = simulation(N, alpha_t, V_t, theta)[0]
-    y_plus = pd.DataFrame(y_plus)
-
-    alpha_plus = simulation(N, alpha_t, V_t, theta)[1]
-
-    a_t_sim = kalmanFilter(y_plus, theta)[0]  # Filtered state a_t
-    P_t_sim = kalmanFilter(y_plus, theta)[1]  # Filtered state variance p_t,
-    v_t_sim = kalmanFilter(y_plus, theta)[2]  # Prediction errors v_t
-    F_t_sim = kalmanFilter(y_plus, theta)[3]  # Prediction variance F_t
-    alpha_plus_hat = kalmanFilter_smooth(a_t_sim, P_t_sim, v_t_sim, F_t_sim, y_plus, theta)[0]
-
-    h_t = alpha_t[2:] + alpha_plus[1:] - alpha_plus_hat[2:]
+    # P_t = kalmanFilter(x_t,theta)[1]  # Filtered state variance p_t,
+    # v_t = kalmanFilter(x_t,theta)[2]  # Prediction errors v_t
+    # F_t = kalmanFilter(x_t,theta)[3]  # Prediction variance F_t
+    # alpha_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[0]
+    # V_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[1]
+    # r_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[2]
+    # N_t = kalmanFilter_smooth(a_t, P_t, v_t, F_t, x_t, theta)[3]
+    #
+    # #simulated y's and alpha's
+    # y_plus = simulation(N, alpha_t, V_t, theta)[0]
+    # y_plus = pd.DataFrame(y_plus)
+    #
+    # alpha_plus = simulation(N, alpha_t, V_t, theta)[1]
+    #
+    # a_t_sim = kalmanFilter(y_plus, theta)[0]  # Filtered state a_t
+    # P_t_sim = kalmanFilter(y_plus, theta)[1]  # Filtered state variance p_t,
+    # v_t_sim = kalmanFilter(y_plus, theta)[2]  # Prediction errors v_t
+    # F_t_sim = kalmanFilter(y_plus, theta)[3]  # Prediction variance F_t
+    # alpha_plus_hat = kalmanFilter_smooth(a_t_sim, P_t_sim, v_t_sim, F_t_sim, y_plus, theta)[0]
+    #
+    # h_t = alpha_t[2:] + alpha_plus[1:] - alpha_plus_hat[2:]
     
     # plot_d(x_t, h_t[2:])
     return

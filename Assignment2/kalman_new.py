@@ -23,12 +23,13 @@ class KFnew():
         self.y = np.array(df[var].values.flatten())
         self.times = df.index
         self.options = {'eps': 1e-09,
-                        'maxiter': 2000}
+                        'maxiter': 200}
 
-    def init_filter(self, a, P, b=None):
+    def init_filter(self, a, P, b=None, alpha_mean=None):
         self.a_start = a
         self.b_start = b
         self.P_start = P
+        self.alpha_mean = alpha_mean
 
     def __llik_fun__(self, par_ini):
         # likelihood function of state space model
@@ -37,8 +38,7 @@ class KFnew():
             _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
         elif self.method == 'iterateRegression':
                 _, __, P, v, F = self.iterateRegression(plot=False, estimate=True, init_params=par_ini)
-        L= (n / 2)*np.log(2*np.pi) - 0.5 * np.sum(np.log(np.abs(F[1:]))) - 0.5 * np.sum((v[1:] ** 2) / F[1:]) #+ np.log(self.P_start)
-        # print(L)
+        L= -(n / 2)*np.log(2*np.pi) - 0.5 * np.sum(np.log(np.abs(F[1:]))) - 0.5 * np.sum((v[1:] ** 2) / F[1:]) #+ np.log(self.P_start)
         return (-1)*L
 
     def fit_model(self, phi, omega, sigma_eta, beta=0):
@@ -48,7 +48,7 @@ class KFnew():
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
         est = minimize(self.__llik_fun__, x0=par_ini,
                        options=self.options,
-                       method='BFGS', bounds=((-1, 1), (-100, 100), (0, 10000), (-1, 1)), jac=Lprime)
+                       method='BFGS') #, jac=Lprime)
         return est.x
 
     def iterate(self, plot=True, estimate=False, init_params=None):
@@ -65,19 +65,21 @@ class KFnew():
             self.R = np.array(init_params[2])
             # self.H = np.array(init_params[0])
             # self.Q = np.array(init_params[1])
-        P[0] = self.P_start
+        P[0] = self.P_start #0.8035 / (1 - 0.995 ** 2)
         a[0] = self.a_start
         # Iterate
         for t in range(0, len(self.y) - 1):
             v[t] = self.y[t] - self.Z * a[t] - self.d
             F[t] = self.Z * P[t] * self.Z.transpose() + self.H
-            # print(v[t], F[t], P[t])
             a_t = a[t] + ((P[t] * self.Z.transpose()) / F[t]) * v[t]
             a[t + 1] = self.T * a_t + self.c
+            # print(v[t], F[t], P[t], a[t], self.y[t])
             P_t = P[t] - ((P[t] * self.Z.transpose()) / F[t]) * self.Z * P[t]
             P[t + 1] = self.T * P_t * self.T.transpose() + self.R * self.Q * self.R.transpose()
+            # print(self.T * P_t * self.T.transpose() + self.R * self.Q * self.R.transpose(), self.R * self.Q * self.R.transpose() )
         F[-1] = P[-1] + self.H
         v[-1] = self.y[-1] - a[-1]
+
         # Obtain std error of prediction form variance
         std = np.sqrt((P * self.H) / (P + self.H))
         if plot:
@@ -96,7 +98,7 @@ class KFnew():
             self.T = np.array([[init_params[0],0],[0,1]])
             self.c = np.vstack(([init_params[1],0]))
             self.R = np.vstack(([init_params[2]],[0]))
-            self.a_start = np.vstack(([-10.89], [init_params[3]]))
+            self.a_start = np.vstack(([self.alpha_mean], [init_params[3]]))
             # self.H = np.array(init_params[0])
             # self.Q = np.array(init_params[1])
         P[0,:,:] = self.P_start
@@ -150,3 +152,9 @@ class KFnew():
         if plot:
             plot_fig2_2(self.times, self.y, alphas, std, V, r, N)
         return alphas, N
+
+    def particle_filter(self, phi, sigma_eta2, N):
+        theta, _ = self.state_smooth()
+        for i in range(len(theta)):
+            n_draws = np.random.normal(loc=phi*theta[i], scale=sigma_eta2, size=N)
+            # weigths = np.exp(-0.5*np.log())
