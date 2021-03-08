@@ -37,31 +37,19 @@ class KFnew():
             _, __, P, v, F = self.iterate(plot=False, estimate=True, init_params=par_ini)
         elif self.method == 'iterateRegression':
                 _, __, P, v, F = self.iterateRegression(plot=False, estimate=True, init_params=par_ini)
-        L= (n - 1) / 2 - 0.5 * np.sum(np.log(F[1:])) - 0.5 * np.sum((v[1:] ** 2) / F[1:]) #+ np.log(self.P_start)
+        L= (n / 2)*np.log(2*np.pi) - 0.5 * np.sum(np.log(np.abs(F[1:]))) - 0.5 * np.sum((v[1:] ** 2) / F[1:]) #+ np.log(self.P_start)
+        # print(L)
         return (-1)*L
 
-    def fit_model(self):
+    def fit_model(self, phi, omega, sigma_eta, beta=0):
         # Initialize at the initial values parsed to the class
-        phi = self.T
-        omega = self.c
-        sigma_eta2 = self.R
-        # sigma_eta2 = self.Q
-        # sigma_eps2 = self.H
-        par_ini = [phi, omega, sigma_eta2]
-        # par_ini = [sigma_eps2, sigma_eta2]
+        par_ini = [phi, omega, sigma_eta, beta]
         # minimize the likelihood function
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
         est = minimize(self.__llik_fun__, x0=par_ini,
                        options=self.options,
-                       method='Newton-CG', bounds=((-1, 1), (-100, 100), (0, 10000)), jac=Lprime)
-        self.T = est.x[0]
-        self.c = est.x[1]
-        self.R = est.x[2]
-        # self.Q = est.x[1]
-        # self.H = est.x[0]
-        print('omega', est.x[1])
-        print('phi', est.x[0])
-        print('sigma', est.x[2])
+                       method='BFGS', bounds=((-1, 1), (-100, 100), (0, 10000), (-1, 1)), jac=Lprime)
+        return est.x
 
     def iterate(self, plot=True, estimate=False, init_params=None):
         """Iterate over the observations and update the filtered values after each iteration"""
@@ -83,6 +71,7 @@ class KFnew():
         for t in range(0, len(self.y) - 1):
             v[t] = self.y[t] - self.Z * a[t] - self.d
             F[t] = self.Z * P[t] * self.Z.transpose() + self.H
+            # print(v[t], F[t], P[t])
             a_t = a[t] + ((P[t] * self.Z.transpose()) / F[t]) * v[t]
             a[t + 1] = self.T * a_t + self.c
             P_t = P[t] - ((P[t] * self.Z.transpose()) / F[t]) * self.Z * P[t]
@@ -107,6 +96,7 @@ class KFnew():
             self.T = np.array([[init_params[0],0],[0,1]])
             self.c = np.vstack(([init_params[1],0]))
             self.R = np.vstack(([init_params[2]],[0]))
+            self.a_start = np.vstack(([-10.89], [init_params[3]]))
             # self.H = np.array(init_params[0])
             # self.Q = np.array(init_params[1])
         P[0,:,:] = self.P_start
@@ -122,8 +112,8 @@ class KFnew():
             # print(a_t)
             P_t = P[t] - np.dot((np.dot(P[t],self.Z[:,t:t+1]) / F[t]),np.dot(self.Z[:,t:t+1].T, P[t]))
             P[t + 1,:,:] = np.dot(np.dot(self.T, P_t),self.T.transpose()) + np.dot(self.R * self.Q,self.R.transpose())
-        F[-1] = np.dot(np.dot(self.Z[:,-1].T, P[-1]),self.Z[:,t]) + self.H
-        v[-1] = self.y[-1] - a_b[0,-1]
+        F[-1] = np.dot(np.dot(self.Z[:,-1:].T, P[-1]),self.Z[:,-1:]) + self.H
+        v[-1] = self.y[-1] - a_b[0,-1:]
         # Obtain std error of prediction form variance
         std = np.sqrt((P[:,0,0] * self.H) / (P[:,0,0] + self.H))
         if plot:
