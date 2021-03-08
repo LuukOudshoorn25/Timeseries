@@ -105,25 +105,27 @@ class KFnew():
         # Initialize at the initial values parsed to the class
         if estimate == True:
             self.T = np.array([[init_params[0],0],[0,1]])
-            self.c = np.array([init_params[1],0])
-            self.R = np.array([[init_params[2]],[0]])
+            self.c = np.vstack(([init_params[1],0]))
+            self.R = np.vstack(([init_params[2]],[0]))
             # self.H = np.array(init_params[0])
             # self.Q = np.array(init_params[1])
         P[0,:,:] = self.P_start
-        a_b[:,0] = [self.a_start, self.b_start] 
+        a_b[:,0:1] = self.a_start
+        # print(np.shape(a_b[:,0:1]), P[0,:,:], a_b[:,0:1])
         # Iterate
         for t in range(0, len(self.y) - 1):
-            v[t] = self.y[t] - np.dot(self.Z[:,t],a_b[:,t]) - self.d
-            F[t] = np.dot(np.dot(self.Z[:,t], P[t]),self.Z[:,t].T) + self.H
-            a_t = a_b[:,t] + np.dot(P[t],self.Z[:,t].T) / F[t] * v[t]
-            a_t = a_t.reshape(1,-1).T
-            a_b[:,t + 1] = np.dot(self.T, a_t).flatten() + self.c
-            P_t = P[t] - np.dot((np.dot(P[t],self.Z[:,t].transpose()) / F[t]),np.dot(self.Z[:,t], P[t]))
-            P[t + 1,:,:] = np.dot(self.T * P_t,self.T.transpose()) + np.dot(self.R * self.Q,self.R.transpose())
-        F[-1] = np.dot(np.dot(self.Z[:,-1], P[-1]),self.Z[:,t].T) + self.H
+            v[t] = self.y[t] - np.dot(self.Z[:,t:t+1].T,a_b[:,t]) - self.d
+            F[t] = np.dot(np.dot(self.Z[:,t:t+1].T, P[t]),self.Z[:,t:t+1]) + self.H
+            a_t = a_b[:,t:t+1] + np.dot(P[t],self.Z[:,t:t+1] / F[t]) * v[t]
+            # print(self.Z[:,t], np.shape(self.Z[:,t]))
+            a_b[:,t + 1:t+2] = np.dot(self.T, a_t) + self.c
+            # print(a_t)
+            P_t = P[t] - np.dot((np.dot(P[t],self.Z[:,t:t+1]) / F[t]),np.dot(self.Z[:,t:t+1].T, P[t]))
+            P[t + 1,:,:] = np.dot(np.dot(self.T, P_t),self.T.transpose()) + np.dot(self.R * self.Q,self.R.transpose())
+        F[-1] = np.dot(np.dot(self.Z[:,-1].T, P[-1]),self.Z[:,t]) + self.H
         v[-1] = self.y[-1] - a_b[0,-1]
         # Obtain std error of prediction form variance
-        std = np.sqrt((P * self.H) / (P + self.H))
+        std = np.sqrt((P[:,0,0] * self.H) / (P[:,0,0] + self.H))
         if plot:
             plot_fig2_1(self.times, self.y, a, std, P, v, F)
         return a_b, std, P, v, F

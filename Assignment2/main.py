@@ -126,7 +126,6 @@ def SP500():
     df = df.iloc[1:]
     df['transformed_returns'] = np.log((df['logreturns'] - np.mean(df['logreturns'])) ** 2)
     df.index = np.arange(0, len(df), 1)
-    print(df)
     # Define the system matrices
     Z = np.array(1)
     R = np.array(np.sqrt(0.083**2))  # to be estimated
@@ -137,25 +136,36 @@ def SP500():
     Q = np.array(1)
     # Run Kalman filter and reproduce fig 2.1
     # Create Kalman filter object
-    KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns')
-    KFobj.init_filter(a=-10.89, P=R/(1-T**2))
-    KFobj.fit_model()
-    KFobj.iterate()
+    # KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns')
+    # KFobj.init_filter(a=-10.89, P=R/(1-T**2))
+    # KFobj.fit_model()
+    # KFobj.iterate()
     # plt.plot(KFobj.state_smooth(plot=False)[0],color='black',lw=1)
     # plt.scatter(df.index, df['transformed_returns'], s=1)
     # plt.show()
 
     Z = np.vstack((np.ones(len(df)), np.log(df['rk_parzen'].values)))
+    R = np.vstack(([np.sqrt(0.083**2)], [0]))
+    T = np.array([[0.99, 0], [0, 1]])
+    d = np.array([-1.27])
+    c = np.vstack(([-0.08], [0]))
+    H = np.array([np.pi**2/2])
+    Q = np.array([1])
     KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns', method='iterateRegression')
-    KFobj.init_filter(a=-10.89, P=R/(1-T**2), b=0.1)
-    KFobj.fit_model()
-    KFobj.iterateRegression()
+    a_b_start = np.vstack(([-10.89], [0.1]))
+    P_start = np.array([[0.083/(1-0.99**2), 0], [0, 0]])
+    KFobj.init_filter(a=a_b_start, P=P_start)
+    # KFobj.fit_model()
+    a, std, P, v, F= KFobj.iterateRegression(plot=False)
+    plt.plot(df.index, a[0,:], color='black', lw=1)
+    plt.scatter(df.index, df['transformed_returns'], s=1)
+    plt.show()
 
 
 
 def main():
-    DK_book_new()
-    # SP500()
+    # DK_book_new()
+    SP500()
     # nile_data()
 
 if __name__ == "__main__":
