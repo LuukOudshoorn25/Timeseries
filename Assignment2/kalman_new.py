@@ -158,3 +158,25 @@ class KFnew():
         for i in range(len(theta)):
             n_draws = np.random.normal(loc=phi*theta[i], scale=sigma_eta2, size=N)
             # weigths = np.exp(-0.5*np.log())
+
+
+
+    def particle_filter(self, phi, sigma_eta2, N):
+        alphas, _ = KFobj.state_smooth(plot=False)
+        phi, omega, sigma_eta, _ = estimates
+        weights = lambda y,theta: np.exp(-0.5*np.log(2*np.pi*sigma_eta**2)-0.5*theta-1/(sigma_eta**2)*np.exp(-theta)*y**2)
+        for i in range(1,len(alphas[:-1])):
+            # step 1: draw N values alpha_tilde N(at-1,sigma_eta)
+            xi = omega / (1-phi)
+            theta = alphas[i-1] - xi
+            samples = np.random.randn(1000)*sigma_eta + phi*theta
+            # step 2: compute corresponding weights
+            w = weights(y[i], samples)
+            w = w / np.sum(w)
+
+
+
+
+        for i in range(len(theta)):
+            n_draws = np.random.normal(loc=phi*theta[i], scale=sigma_eta2, size=N)
+            # weigths = np.exp(-0.5*np.log())
