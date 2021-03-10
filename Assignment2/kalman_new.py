@@ -99,8 +99,6 @@ class KFnew():
             self.c = np.vstack(([init_params[1],0]))
             self.R = np.vstack(([init_params[2]],[0]))
             self.a_start = np.vstack(([self.alpha_mean], [init_params[3]]))
-            # self.H = np.array(init_params[0])
-            # self.Q = np.array(init_params[1])
         P[0,:,:] = self.P_start
         a_b[:,0:1] = self.a_start
         # print(np.shape(a_b[:,0:1]), P[0,:,:], a_b[:,0:1])
@@ -109,9 +107,7 @@ class KFnew():
             v[t] = self.y[t] - np.dot(self.Z[:,t:t+1].T,a_b[:,t]) - self.d
             F[t] = np.dot(np.dot(self.Z[:,t:t+1].T, P[t]),self.Z[:,t:t+1]) + self.H
             a_t = a_b[:,t:t+1] + np.dot(P[t],self.Z[:,t:t+1] / F[t]) * v[t]
-            # print(self.Z[:,t], np.shape(self.Z[:,t]))
             a_b[:,t + 1:t+2] = np.dot(self.T, a_t) + self.c
-            # print(a_t)
             P_t = P[t] - np.dot((np.dot(P[t],self.Z[:,t:t+1]) / F[t]),np.dot(self.Z[:,t:t+1].T, P[t]))
             P[t + 1,:,:] = np.dot(np.dot(self.T, P_t),self.T.transpose()) + np.dot(self.R * self.Q,self.R.transpose())
         F[-1] = np.dot(np.dot(self.Z[:,-1:].T, P[-1]),self.Z[:,-1:]) + self.H
@@ -121,6 +117,36 @@ class KFnew():
         if plot:
             plot_fig2_1(self.times, self.y, a, std, P, v, F)
         return a_b, std, P, v, F
+
+    def state_smoothRegression(self, plot=True):
+        a, std, P, v, F = self.iterateRegression(plot=False)
+        # Obtain all time values for L
+        K = np.dot(self.T, np.dot(P, self.Z/F))
+        L = self.T - np.dot(K, self.Z)
+
+        # Do the recursion for r
+        r = np.zeros(len(self.y))
+        N = np.zeros(len(self.y))
+        V = np.zeros(len(self.y))
+
+        for t in np.arange(len(self.y) - 1, -1, -1):
+            r[t-1] = (self.Z.transpose()/F[t])*v[t] + L[t] * r[t]
+        for t in np.arange(len(self.y) - 1, 0, -1):
+            N[t-1] = (self.Z.transpose()/F[t])*self.Z + L[t]**2 * N[t]
+        for t in np.arange(len(self.y) - 1, 0, -1):
+            V[t] = P[t] - P[t] ** 2 * N[t - 1]
+        V[0] = V[-1]
+        N[0] = N[-2]
+
+        # Do the recursion for alpha
+        alphas = np.zeros(len(self.y))
+        alphas[0] = a[t]
+        for t in range(0, len(self.y)):
+            alphas[t] = a[t] + P[t] * r[t - 1]
+        alphas[-1] = np.nan
+        std = np.sqrt(V)[1:]
+        # print(self.y[0])
+        return alphas, N
 
     def state_smooth(self, plot=True):
         a, std, P, v, F = self.iterate(plot=False)
@@ -149,17 +175,7 @@ class KFnew():
         alphas[-1] = np.nan
         std = np.sqrt(V)[1:]
         # print(self.y[0])
-        if plot:
-            plot_fig2_2(self.times, self.y, alphas, std, V, r, N)
         return alphas, N
-
-    def particle_filter(self, phi, sigma_eta2, N):
-        theta, _ = self.state_smooth()
-        for i in range(len(theta)):
-            n_draws = np.random.normal(loc=phi*theta[i], scale=sigma_eta2, size=N)
-            # weigths = np.exp(-0.5*np.log())
-
-
 
     def particle_filter(self, phi, sigma_eta2, N):
         alphas, _ = KFobj.state_smooth(plot=False)

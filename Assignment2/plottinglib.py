@@ -14,7 +14,7 @@ def make_titles(axes):
 
 def plot_raw_data(df):
     times = df.index
-    returns = df.returns
+    returns = df.logreturns
     transformed = df.transformed_returns
 
     fig,[[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(6.5, 5))
@@ -26,7 +26,7 @@ def plot_raw_data(df):
     ax4.set_title('')
     ax1, ax2, ax3, ax4 = make_titles([ax1,ax2,ax3,ax4])
     plt.tight_layout()
-    plt.savefig('data_fig.pdf', bbox_inches='tight')
+    plt.savefig('data_SP500.pdf', bbox_inches='tight')
     # plt.xlabel('Year')
     
     plt.show()
@@ -38,12 +38,19 @@ def QMLplot(df):
     plt.tight_layout()
     plt.show()
 
-def plot_smoothed(x, y, alphas, fname):
-    fig, ax = plt.subplots(1, figsize=(6,2.5))
-    ax.scatter(x,y,s=1,color='black')
-    ax.plot(x,alphas,lw=1,color='red')
-    ax.set_xlabel('Time')
-    ax.set_ylabel(r'$\log (y_t-\overline{y})^2$')
+def plot_smoothed(df, filtered_alphas, smoothed_alphas, xi, fname='KF_pounddollarexchange.pdf'):
+    fig, axs = plt.subplots(2, sharex=True, figsize=(6,2.5))
+    axs[0].scatter(df.index,df['transformed_returns'],s=1,color='black')
+    axs[0].plot(df.index[1:], filtered_alphas,lw=1,color='red', label='Filtered Signal')
+    axs[0].plot(df.index[1:], smoothed_alphas, lw=1, color='blue', label='Smoothed Signal')
+    axs[0].set_ylabel(r'$\log (y_t-\overline{y})^2$')
+    # axs[0].legend()
+    axs[1].scatter(df.index, df['logreturns']*100, s=1, color='black')
+    axs[1].plot(df.index[1:], filtered_alphas-xi, lw=1,color='red', label='Filtered Signal')
+    axs[1].plot(df.index[1:], smoothed_alphas-xi, lw=1, color='blue', label='Smoothed Signal')
+    # axs[1].legend()
+    axs[1].set_ylabel('$y_t$')
+    plt.xlabel('Time')
     plt.tight_layout()
     plt.savefig(fname, bbox_inches='tight')
     plt.show()
