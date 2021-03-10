@@ -25,12 +25,6 @@ def DK_book():
     
     x_t = np.log((df['returns']-np.mean(df['returns']))**2)
     df['transformed_returns'] = x_t
-
-    # plot raw data
-    #plot_raw_data(df)
-
-    # Perform QML-method
-    #QMLplot(df)
     
     init_parameters = {'phi': 0.99,
                        'omega': -0.08,
@@ -90,8 +84,7 @@ def DK_book_new():
     KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns')
     KFobj.init_filter(a=(omega/(1-phi)), P= sigma_eta**2 / (1 - phi ** 2))
     estimates = KFobj.fit_model(phi=np.array(phi), omega=np.array(omega), sigma_eta=np.array(sigma_eta) )
-    # print(KFobj.__llik_fun__(par_ini=[estimates[0], estimates[1], estimates[2]]))
-    # print(estimates)
+    
     KFobj.T = np.array(estimates[0])
     KFobj.c = np.array(estimates[1])
     KFobj.R = np.array(estimates[2])
@@ -177,38 +170,39 @@ def SP500():
     omega = -0.06589895
     alpha_mean = omega / (1 - phi)
     alpha_var = sigma_eta ** 2 / (1 - phi ** 2)
-    # # Define the system matrices
-    # Z = np.array(1)
-    # R = np.array(sigma_eta)  # to be estimated
-    # T = np.array(phi)  # to be estimated
-    # d = np.array(-1.27)
-    # c = np.array(omega) # to be estimated
-    # H = np.array(np.pi**2/2)
-    # Q = np.array(1)
-    # #
-    # # # Create Kalman filter object
-    # KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns', method='iterate')
-    # KFobj.init_filter(a=alpha_mean, P=alpha_var)
-    # estimates = KFobj.fit_model(phi=np.array(0.99), omega=np.array(-0.08), sigma_eta=np.array(np.sqrt(0.083**2)) )
-    # print(estimates)
-    # phi = estimates[0]
-    # omega = estimates[1]
-    # sigma_eta = estimates[2]
-    # alpha_mean = omega / (1 - phi)
-    # alpha_var = sigma_eta ** 2 / (1 - phi ** 2)
-    # KFobj.init_filter(a=alpha_mean, P=alpha_var)
-    # KFobj.T = np.array(estimates[0])
-    # KFobj.c = np.array(estimates[1])
-    # KFobj.R = np.array(estimates[2])
-    # # plot filtered and smoothed estimates
-    # xi = KFobj.c/(1-KFobj.T)
-    # filtered_signal = KFobj.iterate(plot=False)[0][1:]
-    # smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
-    # plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
+    # Define the system matrices
+    Z = np.array(1)
+    R = np.array(sigma_eta)  # to be estimated
+    T = np.array(phi)  # to be estimated
+    d = np.array(-1.27)
+    c = np.array(omega) # to be estimated
+    H = np.array(np.pi**2/2)
+    Q = np.array(1)
+    #
+    # # Create Kalman filter object
+    KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns', method='iterate')
+    KFobj.init_filter(a=alpha_mean, P=alpha_var)
+    estimates = KFobj.fit_model(phi=np.array(0.99), omega=np.array(-0.08), sigma_eta=np.array(np.sqrt(0.083**2)) )
+    print(estimates)
+    phi = estimates[0]
+    omega = estimates[1]
+    sigma_eta = estimates[2]
+    alpha_mean = omega / (1 - phi)
+    alpha_var = sigma_eta ** 2 / (1 - phi ** 2)
+    KFobj.init_filter(a=alpha_mean, P=alpha_var)
+    KFobj.T = np.array(estimates[0])
+    KFobj.c = np.array(estimates[1])
+    KFobj.R = np.array(estimates[2])
+    # plot filtered and smoothed estimates
+    xi = KFobj.c/(1-KFobj.T)
+    filtered_signal = KFobj.iterate(plot=False)[0][1:]
+    smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
+    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
 
 def main():
-    # DK_book_new()
+    DK_book_new()
     SP500()
+    # SP500_regression()
 
 if __name__ == "__main__":
     main()
