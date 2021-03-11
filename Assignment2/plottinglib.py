@@ -55,4 +55,10 @@ def plot_smoothed(df, filtered_alphas, smoothed_alphas, xi, fname='KF_pounddolla
     plt.savefig(fname, bbox_inches='tight')
     plt.show()
 
+def plot_pf(outputs):
+    fig, [ax1,ax2] = plt.subplots(2, figsize=(6,3))
+    ax1.plot(outputs[2,:],lw=0.8)
+    ax2.plot(outputs[0,:],lw=0.8)
+    plt.tight_layout()
+    plt.show()
     

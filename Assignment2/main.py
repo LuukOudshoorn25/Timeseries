@@ -92,7 +92,11 @@ def DK_book_new():
     xi = KFobj.c/(1-KFobj.T)
     filtered_signal = KFobj.iterate(plot=False)[0][1:]
     smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
-    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi)
+    #plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi)
+    # Particle filter
+    print(estimates)
+    PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
+    plot_pf(PF_outputs)
 
 def SP500_regression():
     # Set matplotlib style for fancy plotting
@@ -201,7 +205,7 @@ def SP500():
 
 def main():
     DK_book_new()
-    SP500()
+    #SP500()
     # SP500_regression()
 
 if __name__ == "__main__":

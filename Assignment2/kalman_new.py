@@ -177,22 +177,35 @@ class KFnew():
         # print(self.y[0])
         return alphas, N
 
-    def particle_filter(self, phi, sigma_eta2, N):
-        alphas, _ = KFobj.state_smooth(plot=False)
-        phi, omega, sigma_eta, _ = estimates
-        weights = lambda y,theta: np.exp(-0.5*np.log(2*np.pi*sigma_eta**2)-0.5*theta-1/(sigma_eta**2)*np.exp(-theta)*y**2)
-        for i in range(1,len(alphas[:-1])):
+    def particle_filter(self, estimates,y):
+        alphas, _ = self.state_smooth(plot=False)
+        phi, omega, sigma_eta,_ = estimates
+        phi, omega, sigma_eta = 0.991,-0.088,0.084
+        weights = lambda y,theta: np.exp(-0.5*np.log(2*np.pi) - 0.5*np.exp(theta+xi)-0.5*y**2 / np.exp(theta+xi))
+        outputs = np.zeros((3,len(alphas)-2))        
+        for i in range(0,len(alphas[:-1])):
             # step 1: draw N values alpha_tilde N(at-1,sigma_eta)
             xi = omega / (1-phi)
-            theta = alphas[i-1] - xi
-            samples = np.random.randn(1000)*sigma_eta + phi*theta
+            if i ==0:
+                # Initial values
+                samples = np.random.randn(10000)*(sigma_eta/(1-phi**2))
+            else:
+                theta = alphas[i-1] - xi
+                samples = np.random.randn(10000)*sigma_eta + phi*theta
             # step 2: compute corresponding weights
             w = weights(y[i], samples)
+            print(w)
             w = w / np.sum(w)
+            ESS = (np.sum(w**2)**(-1))
+            signal_hat = np.sum(w*samples)
+            P_hat = np.sum(w*samples**2)-signal_hat
+            resampling = np.mean(np.random.choice(samples, p=w, size=10000))
+            outputs[0,i-1] = resampling
+            outputs[1,i-1] = P_hat
+            outputs[2,i-1] = ESS
+        return outputs
 
 
 
 
-        for i in range(len(theta)):
-            n_draws = np.random.normal(loc=phi*theta[i], scale=sigma_eta2, size=N)
-            # weigths = np.exp(-0.5*np.log())
+
