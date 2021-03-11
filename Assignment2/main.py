@@ -97,7 +97,7 @@ def DK_book_new():
     print(estimates)
     PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
     #plot_pf(PF_outputs)
-    plot_Hts(PF_outputs[0,:],smoothed_signal,estimates)
+    plot_Hts(PF_outputs[0,:],smoothed_signal,filtered_signal,estimates)
     
     
 
@@ -204,7 +204,7 @@ def SP500():
     xi = KFobj.c/(1-KFobj.T)
     filtered_signal = KFobj.iterate(plot=False)[0][1:]
     smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
-    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
+    #plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
 
 def main():
     DK_book_new()
