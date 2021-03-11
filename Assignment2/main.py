@@ -98,8 +98,6 @@ def DK_book_new():
     PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
     #plot_pf(PF_outputs)
     plot_Hts(PF_outputs[0,:],smoothed_signal,filtered_signal,estimates)
-    
-    
 
 def SP500_regression():
     # Set matplotlib style for fancy plotting
@@ -113,6 +111,7 @@ def SP500_regression():
     df['transformed_returns'] = np.log((df['returns'] - np.mean(df['returns'])) ** 2)
     df.index = np.linspace(2000, 2021, len(df))
 
+    plot_raw_data(df)
     # set parameters
     sigma_eta = 0.20175882
     phi =  0.98399089
@@ -149,13 +148,9 @@ def SP500_regression():
 
     # plot for regression type model
     xi = omega / (1 - phi)
-    # filtered_signal = KFobj.iterateRegression(plot=False)[0][0,:]
-    smoothed_signal = KFobj.state_smoothRegression(plot=False)[0][0, :]
-    plt.scatter(df.index, df['transformed_returns'], s=1)
-    plt.plot(df.index, smoothed_signal, color='red')
-    plt.show()
-    # smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
-    # plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
+    filtered_signal = KFobj.iterateRegression(plot=False)[0][0,:]
+    smoothed_signal = KFobj.state_smoothRegression(plot=False)[0][0,:]
+    # plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KFregression_SP500.pdf')
 
 def SP500():
     # Set matplotlib style for fancy plotting
@@ -186,7 +181,7 @@ def SP500():
     H = np.array(np.pi**2/2)
     Q = np.array(1)
     #
-    # # Create Kalman filter object
+    # Create Kalman filter object
     KFobj = KFnew(df, Z=Z, R=R, d=d, c=c, H=H, Q=Q, T=T, var='transformed_returns', method='iterate')
     KFobj.init_filter(a=alpha_mean, P=alpha_var)
     estimates = KFobj.fit_model(phi=np.array(0.99), omega=np.array(-0.08), sigma_eta=np.array(np.sqrt(0.083**2)) )
@@ -207,9 +202,9 @@ def SP500():
     #plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
 
 def main():
-    DK_book_new()
+    # DK_book_new()
     #SP500()
-    # SP500_regression()
+    SP500_regression()
 
 if __name__ == "__main__":
     main()

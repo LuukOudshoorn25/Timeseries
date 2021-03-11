@@ -46,9 +46,14 @@ class KFnew():
         par_ini = [phi, omega, sigma_eta, beta]
         # minimize the likelihood function
         Lprime = lambda x: approx_fprime(x, self.__llik_fun__, 0.01)
-        est = minimize(self.__llik_fun__, x0=par_ini,
-                       options=self.options,
-                       method='BFGS') #, jac=Lprime)
+        if self.method == 'iterateRegression':
+            est = minimize(self.__llik_fun__, x0=par_ini,
+                           options=self.options,
+                           method='Newton-CG', jac=Lprime)
+        else:
+            est = minimize(self.__llik_fun__, x0=par_ini,
+                           options=self.options,
+                           method='BFGS')
         return est.x
 
     def iterate(self, plot=True, estimate=False, init_params=None):
@@ -120,32 +125,30 @@ class KFnew():
 
     def state_smoothRegression(self, plot=True):
         a, std, P, v, F = self.iterateRegression(plot=False)
-        # Obtain all time values for L
-        K = np.dot(self.T, np.dot(P, self.Z/F))
-        L = self.T - np.dot(K, self.Z)
-
         # Do the recursion for r
-        r = np.zeros(len(self.y))
-        N = np.zeros(len(self.y))
-        V = np.zeros(len(self.y))
+        r = np.zeros((2, len(self.y)))
+        N = np.zeros((len(self.y), 2, 2))
+        V = np.zeros((len(self.y), 2, 2))
 
         for t in np.arange(len(self.y) - 1, -1, -1):
-            r[t-1] = (self.Z.transpose()/F[t])*v[t] + L[t] * r[t]
+            K = np.dot(self.T, np.dot(P[t], self.Z[:,t:t+1] / F[t]))
+            L = self.T - np.dot(K, self.Z[:,t:t+1].T)
+            r[:,t-1:t] = (self.Z[:,t:t+1]/F[t])*v[t] + np.dot(L.T, r[:,t:t+1])
         for t in np.arange(len(self.y) - 1, 0, -1):
-            N[t-1] = (self.Z.transpose()/F[t])*self.Z + L[t]**2 * N[t]
+            K = np.dot(self.T, np.dot(P[t], self.Z[:,t:t+1] / F[t]))
+            L = self.T - np.dot(K, self.Z[:,t:t+1].T)
+            N[t-1] = np.dot(self.Z[:,t:t+1]/F[t],self.Z[:,t:t+1].T) + np.dot(L**2, N[t])
         for t in np.arange(len(self.y) - 1, 0, -1):
-            V[t] = P[t] - P[t] ** 2 * N[t - 1]
+            V[t] = P[t] - np.dot(P[t] ** 2, N[t - 1])
         V[0] = V[-1]
         N[0] = N[-2]
 
         # Do the recursion for alpha
-        alphas = np.zeros(len(self.y))
-        alphas[0] = a[t]
+        alphas = np.zeros((2, len(self.y)))
+        alphas[:,0] = a[:,t]
         for t in range(0, len(self.y)):
-            alphas[t] = a[t] + P[t] * r[t - 1]
-        alphas[-1] = np.nan
-        std = np.sqrt(V)[1:]
-        # print(self.y[0])
+            alphas[:,t] = a[:,t] + np.dot(P[t], r[:,t - 1])
+        alphas[:,-1] = np.nan
         return alphas, N
 
     def state_smooth(self, plot=True):

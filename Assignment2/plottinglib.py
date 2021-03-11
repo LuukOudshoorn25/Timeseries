@@ -16,10 +16,13 @@ def plot_raw_data(df):
     times = df.index
     returns = df.logreturns
     transformed = df.transformed_returns
+    parzen = np.log(df.rk_parzen)
 
     fig,[[ax1, ax2], [ax3, ax4]] = plt.subplots(2, 2, figsize=(6.5, 5))
     ax1.plot(times, returns, lw=0.5, color='black')
-    ax2.plot(times, transformed, lw=0.5, color='black')
+    ax2.plot(times, transformed, lw=0.5, color='black', label='Transformed returns')
+    ax2.plot(times, parzen, lw=0.5, color='red', label='Parzen volatility')
+    ax2.legend()
     ax3.hist(returns,bins=40)
     sm.graphics.tsa.plot_acf(returns, lags=15, ax=ax4)
     ax4.set_xlim(0.8,16)
@@ -41,13 +44,13 @@ def QMLplot(df):
 def plot_smoothed(df, filtered_alphas, smoothed_alphas, xi, fname='KF_pounddollarexchange.pdf'):
     fig, axs = plt.subplots(2, sharex=True, figsize=(6,2.5))
     axs[0].scatter(df.index,df['transformed_returns'],s=1,color='black')
-    axs[0].plot(df.index[1:], filtered_alphas,lw=1,color='red', label='Filtered Signal')
-    axs[0].plot(df.index[1:], smoothed_alphas, lw=1, color='blue', label='Smoothed Signal')
+    axs[0].plot(df.index[:], filtered_alphas,lw=1,color='red', label='Filtered Signal')
+    axs[0].plot(df.index[:], smoothed_alphas, lw=1, color='blue', label='Smoothed Signal')
     axs[0].set_ylabel(r'$\log (y_t-\overline{y})^2$')
     # axs[0].legend()
     axs[1].scatter(df.index, df['logreturns']*100, s=1, color='black')
-    axs[1].plot(df.index[1:], filtered_alphas-xi, lw=1,color='red', label='Filtered Signal')
-    axs[1].plot(df.index[1:], smoothed_alphas-xi, lw=1, color='blue', label='Smoothed Signal')
+    axs[1].plot(df.index[:], filtered_alphas-xi, lw=1,color='red', label='Filtered Signal')
+    axs[1].plot(df.index[:], smoothed_alphas-xi, lw=1, color='blue', label='Smoothed Signal')
     # axs[1].legend()
     axs[1].set_ylabel('$y_t$')
     plt.xlabel('Time')
