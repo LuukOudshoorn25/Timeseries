@@ -96,7 +96,10 @@ def DK_book_new():
     # Particle filter
     print(estimates)
     PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
-    plot_pf(PF_outputs)
+    #plot_pf(PF_outputs)
+    plot_Hts(PF_outputs[0,:],smoothed_signal,estimates)
+    
+    
 
 def SP500_regression():
     # Set matplotlib style for fancy plotting

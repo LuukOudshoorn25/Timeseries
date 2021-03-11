@@ -69,3 +69,17 @@ def plot_pf(outputs):
     plt.savefig('fig_q_f.png',dpi=500)
     plt.show()
     
+
+def plot_Hts(signal1, signal2, estimates):
+    phi, omega, sigma_eta,_ = estimates
+    xi = omega / (1-phi)
+    fig, ax1 = plt.subplots(1, figsize=(6,2), sharex=True)
+    ax1.plot(signal1,lw=0.8,color='black',label='Particle Filter')
+    ax1.plot(signal2-xi,lw=0.8,color='red',label='Kalman Smoother')
+    plt.axhline(0,ls='--',color='grey',lw=0.5)
+    ax1.set_ylabel('Pound-dollar exchange rate')
+    ax1.set_xlabel('Time')
+    plt.legend(frameon=1)
+    plt.tight_layout()
+    plt.savefig('KFS_signal_vs_particle.png',dpi=500)
+    plt.show()
