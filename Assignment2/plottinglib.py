@@ -56,9 +56,16 @@ def plot_smoothed(df, filtered_alphas, smoothed_alphas, xi, fname='KF_pounddolla
     plt.show()
 
 def plot_pf(outputs):
-    fig, [ax1,ax2] = plt.subplots(2, figsize=(6,3))
-    ax1.plot(outputs[2,:],lw=0.8)
-    ax2.plot(outputs[0,:],lw=0.8)
+    fig, [ax1,ax2] = plt.subplots(2, figsize=(6,3), sharex=True)
+    ax1.plot(outputs[2,:],lw=0.8,color='black')
+    ax1.set_ylabel('Effeective Sample Size')
+    ax2.plot(outputs[0,:],lw=0.8,color='black')
+    ax2.plot(outputs[0,:]+1.86*np.sqrt(outputs[1,:]),lw=0.8,color='grey')
+    ax2.plot(outputs[0,:]-1.86*np.sqrt(outputs[1,:]),lw=0.8,color='grey')
+    plt.axhline(0,ls='--',color='grey',lw=0.5)
+    ax2.set_ylabel('Pound-dollar exchange rate')
+    ax2.set_xlabel('Time')
     plt.tight_layout()
+    plt.savefig('fig_q_f.png',dpi=500)
     plt.show()
     

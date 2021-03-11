@@ -180,7 +180,6 @@ class KFnew():
     def particle_filter(self, estimates,y):
         alphas, _ = self.state_smooth(plot=False)
         phi, omega, sigma_eta,_ = estimates
-        phi, omega, sigma_eta = 0.991,-0.088,0.084
         weights = lambda y,theta: np.exp(-0.5*np.log(2*np.pi) - 0.5*np.exp(theta+xi)-0.5*y**2 / np.exp(theta+xi))
         outputs = np.zeros((3,len(alphas)-2))        
         for i in range(0,len(alphas[:-1])):
@@ -194,11 +193,10 @@ class KFnew():
                 samples = np.random.randn(10000)*sigma_eta + phi*theta
             # step 2: compute corresponding weights
             w = weights(y[i], samples)
-            print(w)
             w = w / np.sum(w)
             ESS = (np.sum(w**2)**(-1))
             signal_hat = np.sum(w*samples)
-            P_hat = np.sum(w*samples**2)-signal_hat
+            P_hat = np.sum(w*samples**2)-signal_hat**2
             resampling = np.mean(np.random.choice(samples, p=w, size=10000))
             outputs[0,i-1] = resampling
             outputs[1,i-1] = P_hat
