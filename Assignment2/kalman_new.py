@@ -183,6 +183,7 @@ class KFnew():
     def particle_filter(self, estimates,y):
         alphas, _ = self.state_smooth(plot=False)
         phi, omega, sigma_eta,_ = estimates
+        print(y)
         weights = lambda y,theta: np.exp(-0.5*np.log(2*np.pi) - 0.5*np.exp(theta+xi)-0.5*y**2 / np.exp(theta+xi))
         outputs = np.zeros((3,len(alphas)-2))        
         for i in range(0,len(alphas[:-1])):
