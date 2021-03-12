@@ -58,11 +58,10 @@ def DK_book_new():
     filtered_signal = KFobj.iterate(plot=False)[0][1:]
     smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
     # Plot the smoothed signal
-    #plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi)
+    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi)
     # Particle filter
     PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
-    #plot_pf(PF_outputs)
-    #plot_Hts(PF_outputs[0,:],smoothed_signal,filtered_signal,estimates)
+
 
 def SP500_regression():
     # Set matplotlib style for fancy plotting
@@ -117,7 +116,6 @@ def SP500_regression():
     xi = omega / (1 - phi)
     filtered_signal = KFobj.iterateRegression(plot=False)[0][0,:]
     smoothed_signal = KFobj.state_smoothRegression(plot=False)[0][0,:]
-    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KFregression_SP500.pdf')
 
 def SP500():
     """Identical to DK_book_new but for SP500 data
@@ -168,7 +166,6 @@ def SP500():
     xi = KFobj.c/(1-KFobj.T)
     filtered_signal = KFobj.iterate(plot=False)[0][1:]
     smoothed_signal = KFobj.state_smooth(plot=False)[0][1:]
-    plot_smoothed(df=df, filtered_alphas=filtered_signal, smoothed_alphas=smoothed_signal, xi=xi, fname='KF_SP500.pdf')
     df.index = np.arange(0, len(df), 1)
     PF_outputs = KFobj.particle_filter(estimates,df['returns'] - np.mean(df['returns']))
     plot_pf(PF_outputs)
@@ -179,9 +176,9 @@ def main():
     """Main function, from here we call the functions for SP500. 
        SP500 with regression (extension 1) and the dollar-pound echange rate data
     """
-    # DK_book_new()
+    DK_book_new()
     SP500()
-    # SP500_regression()
+    SP500_regression()
 
 if __name__ == "__main__":
     main()

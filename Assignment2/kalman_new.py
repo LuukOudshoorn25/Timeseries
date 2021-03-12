@@ -97,9 +97,6 @@ class KFnew():
 
         # Obtain std error of prediction form variance
         std = np.sqrt((P * self.H) / (P + self.H))
-        if plot:
-            # Plot the data
-            plot_fig2_1(self.times, self.y, a, std, P, v, F)
         return a, std, P, v, F
 
     def iterateRegression(self, plot=True, estimate=False, init_params=None):
@@ -130,8 +127,6 @@ class KFnew():
         v[-1] = self.y[-1] - a_b[0,-1:]
         # Obtain std error of prediction form variance
         std = np.sqrt((P[:,0,0] * self.H) / (P[:,0,0] + self.H))
-        if plot:
-            plot_fig2_1(self.times, self.y, a, std, P, v, F)
         return a_b, std, P, v, F
 
     def state_smoothRegression(self, plot=True):
@@ -192,7 +187,6 @@ class KFnew():
             alphas[t] = a[t] + P[t] * r[t - 1]
         alphas[-1] = np.nan
         std = np.sqrt(V)[1:]
-        # print(self.y[0])
         return alphas, N
 
     def particle_filter(self, estimates,y):
